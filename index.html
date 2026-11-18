@@ -1,0 +1,4664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MilkBook - Dairy Delivery & Smart Ledger</title>
+  <style>
+    /* =========================================================================
+       1. DAIRY FARM THEME TOKENS (FRESH DAY CREAM & COZY NIGHT BARN)
+       ========================================================================= */
+    :root {
+      --bg-outer: #ede7dc;
+      --bg-app: #fefcf8;
+      --bg-card: #ffffff;
+      --bg-subtle: #f6f1e7;
+      --bg-input: #faf6ee;
+      --border-color: #e6dec8;
+      --border-strong: #d4c8ae;
+
+      --text-main: #1c1917;
+      --text-muted: #57534e;
+      --text-faint: #78716c;
+
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --primary-soft: #e0f2fe;
+      --primary-border: #bae6fd;
+
+      --emerald: #16a34a;
+      --emerald-soft: #dcfce7;
+      --emerald-border: #86efac;
+
+      --amber: #d97706;
+      --amber-soft: #fef3c7;
+      --amber-border: #fde68a;
+
+      --rose: #e11d48;
+      --rose-soft: #ffe4e6;
+      --rose-border: #fecdd3;
+
+      --indigo: #4f46e5;
+      --indigo-soft: #e0e7ff;
+
+      --card-done-bg: #f0fdf4;
+      --card-done-border: #86efac;
+      --card-skip-bg: #fff1f2;
+      --card-skip-border: #fecdd3;
+
+      --header-grad: linear-gradient(135deg, #0284c7 0%, #0369a1 58%, #075985 100%);
+      --banner-grad: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      --analytics-grad: linear-gradient(135deg, #0369a1 0%, #1e3a8a 100%);
+
+      --shadow-sm: 0 2px 6px rgba(28, 25, 23, 0.05);
+      --shadow-md: 0 6px 16px rgba(28, 25, 23, 0.09);
+      --shadow-lg: 0 14px 32px rgba(28, 25, 23, 0.16);
+
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 24px;
+    }
+
+    body.dark-mode {
+      --bg-outer: #050811;
+      --bg-app: #0b1120;
+      --bg-card: #111827;
+      --bg-subtle: #1e293b;
+      --bg-input: #172033;
+      --border-color: #26334d;
+      --border-strong: #37486b;
+
+      --text-main: #f8fafc;
+      --text-muted: #cbd5e1;
+      --text-faint: #94a3b8;
+
+      --primary: #38bdf8;
+      --primary-hover: #0ea5e9;
+      --primary-soft: rgba(56, 189, 248, 0.15);
+      --primary-border: rgba(56, 189, 248, 0.35);
+
+      --emerald: #4ade80;
+      --emerald-soft: rgba(74, 222, 128, 0.15);
+      --emerald-border: rgba(74, 222, 128, 0.35);
+
+      --amber: #fbbf24;
+      --amber-soft: rgba(251, 191, 36, 0.15);
+      --amber-border: rgba(251, 191, 36, 0.35);
+
+      --rose: #fb7185;
+      --rose-soft: rgba(251, 113, 133, 0.15);
+      --rose-border: rgba(251, 113, 133, 0.35);
+
+      --indigo: #818cf8;
+      --indigo-soft: rgba(129, 140, 248, 0.15);
+
+      --card-done-bg: rgba(22, 163, 74, 0.14);
+      --card-done-border: rgba(74, 222, 128, 0.45);
+      --card-skip-bg: rgba(225, 29, 72, 0.14);
+      --card-skip-border: rgba(251, 113, 133, 0.45);
+
+      --header-grad: linear-gradient(135deg, #0f172a 0%, #1e293b 62%, #0c4a6e 100%);
+      --banner-grad: linear-gradient(135deg, #172033 0%, #0f172a 100%);
+      --analytics-grad: linear-gradient(135deg, #172554 0%, #0f172a 100%);
+
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 14px 32px rgba(0, 0, 0, 0.58);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-outer);
+      color: var(--text-main);
+      line-height: 1.42;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* App Shell */
+    .app-shell {
+      width: 100%;
+      max-width: 480px;
+      background-color: var(--bg-app);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: var(--shadow-lg);
+      padding-bottom: 86px;
+      transition: background-color 0.25s ease;
+      overflow-x: hidden;
+    }
+
+    /* =========================================================================
+       2. CUTE DAIRY MICRO-ANIMATIONS
+       ========================================================================= */
+    @keyframes mascotFloat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-4px) rotate(-3deg); }
+    }
+
+    @keyframes viewSlideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes popBadge {
+      0% { transform: scale(0.92); }
+      65% { transform: scale(1.04); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes celebrateGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.45); }
+      50% { box-shadow: 0 0 0 6px rgba(22, 163, 74, 0); }
+    }
+
+    .view-animate {
+      animation: viewSlideIn 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .card-stagger {
+      animation: viewSlideIn 0.24s ease both;
+    }
+
+    .bouncy-btn {
+      transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .bouncy-btn:active {
+      transform: scale(0.94);
+    }
+
+    /* =========================================================================
+       3. TOP DAIRY HEADER WITH MILK WAVE & DAY/NIGHT TOGGLE
+       ========================================================================= */
+    .app-header {
+      background: var(--header-grad);
+      color: #ffffff;
+      padding: 13px 15px 22px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .header-wave {
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 14px;
+      pointer-events: none;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-mascot {
+      width: 42px;
+      height: 42px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1.5px solid rgba(255, 255, 255, 0.36);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 21px;
+      flex-shrink: 0;
+      animation: mascotFloat 3.2s ease-in-out infinite;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      line-height: 1.1;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .offline-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #e0f2fe;
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 190px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: #4ade80;
+      display: inline-block;
+      box-shadow: 0 0 6px #4ade80;
+      flex-shrink: 0;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .header-chip {
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .theme-toggle-chip {
+      background: rgba(15, 23, 42, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.36);
+      color: #ffffff;
+      padding: 6px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* =========================================================================
+       4. LAYOUT, CARDS & CONTROLS
+       ========================================================================= */
+    .main-content {
+      padding: 10px 14px 18px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      border: 1.5px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .card-subtitle {
+      font-size: 11.5px;
+      color: var(--text-faint);
+      font-weight: 600;
+    }
+
+    /* Date Bar */
+    .date-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--border-color);
+      background: var(--bg-subtle);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .today-chip-btn {
+      height: 40px;
+      padding: 0 11px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--primary-border);
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .date-input-wrap {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .date-input {
+      width: 100%;
+      height: 40px;
+      border: 1.5px solid var(--border-color);
+      background: var(--bg-input);
+      border-radius: var(--radius-md);
+      text-align: center;
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--text-main);
+      padding: 0 8px;
+      font-family: inherit;
+    }
+
+    body.dark-mode .date-input,
+    body.dark-mode .form-input {
+      color-scheme: dark;
+    }
+
+    /* Shift Toggle */
+    .shift-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      background: var(--bg-subtle);
+      padding: 5px;
+      border-radius: 15px;
+      margin-top: 10px;
+      border: 1px solid var(--border-color);
+    }
+
+    .shift-tab {
+      border: none;
+      background: transparent;
+      padding: 10px 8px;
+      border-radius: 11px;
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .shift-tab.active {
+      background: var(--bg-card);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Animated Shift Progress Bar */
+    .progress-section {
+      margin-top: 11px;
+    }
+
+    .progress-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 9px;
+      background: var(--bg-subtle);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0ea5e9, #16a34a);
+      border-radius: 999px;
+      transition: width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .progress-fill.complete {
+      background: linear-gradient(90deg, #16a34a, #4ade80);
+      animation: celebrateGlow 1.8s infinite;
+    }
+
+    /* Summary Strip */
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 11px;
+      padding-top: 11px;
+      border-top: 1px dashed var(--border-color);
+    }
+
+    .stat-box {
+      background: var(--bg-subtle);
+      border-radius: var(--radius-md);
+      padding: 8px 6px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+
+    .stat-label {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .stat-val {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-top: 2px;
+    }
+
+    .stat-val.blue { color: var(--primary); }
+    .stat-val.emerald { color: var(--emerald); }
+
+    /* Search & Filter Pills */
+    .filter-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 12px;
+      color: var(--text-faint);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 42px;
+      padding: 0 12px 0 36px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--border-color);
+      background: var(--bg-card);
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      font-family: inherit;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .pill-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .pill-btn {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1.5px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .pill-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+
+    .bulk-btn {
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1.5px solid var(--primary-border);
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* =========================================================================
+       5. FLEXIBLE DATE RANGE PICKER COMPONENT (PRESETS + FROM/TO DATES)
+       ========================================================================= */
+    .range-presets-scroll {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .range-presets-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .range-chip {
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1.5px solid var(--border-color);
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .range-chip.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+
+    .range-chip-hero {
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1.5px solid rgba(255, 255, 255, 0.28);
+      background: rgba(255, 255, 255, 0.14);
+      color: #e0f2fe;
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .range-chip-hero.active {
+      background: #ffffff;
+      border-color: #ffffff;
+      color: #0369a1;
+    }
+
+    .from-to-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .from-to-box label {
+      display: block;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 3px;
+    }
+
+    .from-to-input {
+      width: 100%;
+      height: 38px;
+      border-radius: 11px;
+      border: 1.5px solid var(--border-strong);
+      background: var(--bg-input);
+      color: var(--text-main);
+      font-size: 12.5px;
+      font-weight: 800;
+      padding: 0 8px;
+      font-family: inherit;
+    }
+
+    .from-to-input-hero {
+      width: 100%;
+      height: 38px;
+      border-radius: 11px;
+      border: 1.5px solid rgba(255, 255, 255, 0.32);
+      background: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+      font-size: 12.5px;
+      font-weight: 800;
+      padding: 0 8px;
+      font-family: inherit;
+      color-scheme: dark;
+    }
+
+    /* Customer Delivery Card */
+    .delivery-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .cust-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 13px;
+      border: 1.5px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .cust-card.state-done {
+      background: var(--card-done-bg);
+      border-color: var(--card-done-border);
+    }
+
+    .cust-card.state-skipped {
+      background: var(--card-skip-bg);
+      border-color: var(--card-skip-border);
+    }
+
+    .cust-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .cust-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 13px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      border: 1.5px solid var(--primary-border);
+      font-weight: 800;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .cust-info {
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+    }
+
+    .cust-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .cust-name {
+      font-size: 15.5px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .sched-badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+    }
+
+    .sched-badge.morning {
+      background: var(--amber-soft);
+      color: var(--amber);
+      border-color: var(--amber-border);
+    }
+
+    .sched-badge.evening {
+      background: var(--indigo-soft);
+      color: var(--indigo);
+      border-color: rgba(129, 140, 248, 0.35);
+    }
+
+    .sched-badge.both {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-color: var(--primary-border);
+    }
+
+    .cust-meta {
+      font-size: 12px;
+      color: var(--text-faint);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 9px;
+      border-radius: 999px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .status-tag.pending {
+      background: var(--bg-subtle);
+      color: var(--text-faint);
+      border: 1px solid var(--border-color);
+    }
+
+    .status-tag.done {
+      background: var(--emerald);
+      color: #ffffff;
+      animation: popBadge 0.25s ease;
+    }
+
+    .status-tag.skipped {
+      background: var(--rose);
+      color: #ffffff;
+    }
+
+    .cust-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 11px;
+    }
+
+    .btn-deliver {
+      flex: 1;
+      height: 41px;
+      border: none;
+      border-radius: var(--radius-md);
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      box-shadow: 0 3px 8px rgba(2, 132, 199, 0.28);
+    }
+
+    .btn-deliver.logged {
+      background: var(--emerald);
+      box-shadow: 0 3px 8px rgba(22, 163, 74, 0.28);
+    }
+
+    .btn-qty {
+      height: 41px;
+      padding: 0 12px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--border-strong);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-skip {
+      height: 41px;
+      padding: 0 11px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--rose-border);
+      background: var(--bg-card);
+      color: var(--rose);
+      font-size: 12.5px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-skip.active-skip {
+      background: var(--rose);
+      color: #ffffff;
+      border-color: var(--rose);
+    }
+
+    .btn-undo {
+      height: 41px;
+      padding: 0 10px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--border-strong);
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* Customers & Ledger Tab */
+    .due-banner {
+      background: var(--banner-grad);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .due-banner-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #cbd5e1;
+      font-weight: 700;
+    }
+
+    .due-banner-amount {
+      font-size: 26px;
+      font-weight: 800;
+      color: #4ade80;
+      margin-top: 2px;
+    }
+
+    .btn-add-cust {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 11px 14px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.35);
+      white-space: nowrap;
+    }
+
+    .ledger-cust-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      border: 1.5px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .balance-pill {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .balance-val {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .balance-val.due { color: var(--rose); }
+    .balance-val.clear { color: var(--emerald); }
+
+    .balance-sub {
+      font-size: 11px;
+      color: var(--text-faint);
+      font-weight: 700;
+    }
+
+    /* =========================================================================
+       6. ANALYTICS & BUSINESS REPORTS STYLES
+       ========================================================================= */
+    .analytics-hero {
+      background: var(--analytics-grad);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 15px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-pdf-hero {
+      width: 100%;
+      margin-top: 12px;
+      height: 44px;
+      border: none;
+      border-radius: var(--radius-md);
+      background: #16a34a;
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+    }
+
+    .kpi-grid-2x2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: 13px;
+      border: 1.5px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .kpi-icon-badge {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .kpi-value {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-top: 2px;
+      line-height: 1.2;
+    }
+
+    .kpi-footnote {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .split-bar-track {
+      width: 100%;
+      height: 14px;
+      background: var(--bg-subtle);
+      border-radius: 999px;
+      overflow: hidden;
+      display: flex;
+      margin: 10px 0 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .split-bar-morning {
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+      height: 100%;
+      transition: width 0.35s ease;
+    }
+
+    .split-bar-evening {
+      background: linear-gradient(90deg, #4f46e5, #6366f1);
+      height: 100%;
+      transition: width 0.35s ease;
+    }
+
+    .split-legend {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .svg-chart-wrap {
+      width: 100%;
+      overflow-x: auto;
+      padding-top: 4px;
+    }
+
+    .chart-meta-pills {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .mini-pill {
+      flex: 1;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 7px 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .due-quick-btn {
+      padding: 6px 10px;
+      border-radius: 9px;
+      border: 1.5px solid var(--primary-border);
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* =========================================================================
+       7. BOTTOM NAVIGATION (4 TABS)
+       ========================================================================= */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 480px;
+      background: var(--bg-card);
+      border-top: 1.5px solid var(--border-color);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 6px 4px 9px;
+      z-index: 35;
+      box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.08);
+      transition: background-color 0.25s ease;
+    }
+
+    .nav-item {
+      border: none;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: var(--text-faint);
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      padding: 3px 2px;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    .nav-icon-wrap {
+      padding: 4px 14px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .nav-item.active .nav-icon-wrap {
+      background: var(--primary-soft);
+      transform: translateY(-1px);
+    }
+
+    /* =========================================================================
+       8. MODALS, FULLSCREEN LEDGER & CLARITY BOX
+       ========================================================================= */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(3px);
+      z-index: 50;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0;
+    }
+
+    @media (min-width: 500px) {
+      .modal-backdrop {
+        align-items: center;
+        padding: 16px;
+      }
+    }
+
+    .modal-sheet {
+      background: var(--bg-card);
+      color: var(--text-main);
+      width: 100%;
+      max-width: 480px;
+      border-radius: 24px 24px 0 0;
+      padding: 18px 16px 24px;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      animation: viewSlideIn 0.2s ease-out;
+      border: 1px solid var(--border-color);
+    }
+
+    @media (min-width: 500px) {
+      .modal-sheet {
+        border-radius: 22px;
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 14px;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .close-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Fullscreen Ledger View */
+    .fullscreen-modal {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-app);
+      z-index: 45;
+      display: flex;
+      justify-content: center;
+      overflow-y: auto;
+    }
+
+    .fullscreen-inner {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background: var(--bg-app);
+      padding-bottom: 44px;
+    }
+
+    .clarity-box {
+      background: var(--bg-subtle);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 11px 12px;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .clarity-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-weight: 600;
+      gap: 8px;
+    }
+
+    .clarity-row.total {
+      border-top: 1.5px dashed var(--border-strong);
+      padding-top: 7px;
+      margin-top: 2px;
+      font-weight: 800;
+      color: var(--text-main);
+      font-size: 13.5px;
+    }
+
+    /* Form Controls */
+    .form-group {
+      margin-bottom: 13px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 44px;
+      padding: 0 12px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--border-strong);
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      font-family: inherit;
+      background: var(--bg-input);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .sched-option {
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 10px 6px;
+      text-align: center;
+      cursor: pointer;
+      background: var(--bg-subtle);
+      transition: all 0.15s ease;
+    }
+
+    .sched-option.selected {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .sched-option-icon {
+      font-size: 18px;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .sched-option-text {
+      font-size: 11.5px;
+      font-weight: 800;
+      display: block;
+    }
+
+    .qty-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .qty-preset {
+      height: 44px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--primary-border);
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-primary-full {
+      width: 100%;
+      height: 46px;
+      border: none;
+      border-radius: var(--radius-md);
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 14.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-emerald-full {
+      width: 100%;
+      height: 46px;
+      border: none;
+      border-radius: var(--radius-md);
+      background: var(--emerald);
+      color: #ffffff;
+      font-size: 14.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-outline-full {
+      width: 100%;
+      height: 44px;
+      border: 1.5px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* Tables */
+    .ledger-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .ledger-table th {
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      font-weight: 800;
+      text-align: left;
+      padding: 9px 9px;
+      border-bottom: 1.5px solid var(--border-color);
+    }
+
+    .ledger-table td {
+      padding: 9px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+      font-weight: 700;
+    }
+
+    .num-right {
+      text-align: right !important;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px 18px;
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1.5px dashed var(--border-strong);
+    }
+
+    .empty-state h3 {
+      font-size: 15.5px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-top: 8px;
+    }
+
+    .empty-state p {
+      font-size: 12.5px;
+      color: var(--text-faint);
+      margin-top: 4px;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      top: 76px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      z-index: 95;
+      box-shadow: var(--shadow-lg);
+      white-space: nowrap;
+      animation: viewSlideIn 0.18s ease;
+    }
+
+    /* =========================================================================
+       9. PDF PREVIEW MODAL + CRISP A4 PRINT STYLESHEET
+       ========================================================================= */
+    .pdf-preview-paper {
+      background: #ffffff;
+      color: #0f172a;
+      border-radius: 12px;
+      padding: 15px;
+      border: 1px solid #cbd5e1;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+
+    .pdf-sheet {
+      width: 100%;
+      color: #0f172a;
+      background: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    .pdf-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2.5px solid #0284c7;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+      gap: 10px;
+    }
+
+    .pdf-brand-name {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0369a1;
+    }
+
+    .pdf-brand-sub {
+      font-size: 11px;
+      color: #475569;
+      margin-top: 2px;
+    }
+
+    .pdf-doc-badge {
+      text-align: right;
+    }
+
+    .pdf-doc-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+      text-transform: uppercase;
+    }
+
+    .pdf-doc-meta {
+      font-size: 11px;
+      color: #475569;
+      margin-top: 2px;
+    }
+
+    .pdf-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .pdf-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 9px 11px;
+      background: #f8fafc;
+    }
+
+    .pdf-box-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #64748b;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .pdf-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .pdf-kpi {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+      background: #f8fafc;
+    }
+
+    .pdf-kpi-lbl {
+      font-size: 10px;
+      color: #64748b;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .pdf-kpi-val {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-top: 2px;
+    }
+
+    .pdf-section-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 12px 0 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .pdf-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      margin-bottom: 12px;
+    }
+
+    .pdf-table th {
+      background: #f1f5f9;
+      color: #1e293b;
+      font-weight: 800;
+      text-align: left;
+      padding: 6px 7px;
+      border: 1px solid #cbd5e1;
+    }
+
+    .pdf-table td {
+      padding: 6px 7px;
+      border: 1px solid #cbd5e1;
+      color: #1e293b;
+    }
+
+    .pdf-table tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    .pdf-table tfoot td {
+      background: #e0f2fe !important;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .pdf-summary-box {
+      border: 1.5px solid #0284c7;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .pdf-sum-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 11.5px;
+    }
+
+    .pdf-sum-row.final {
+      background: #0284c7;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 13px;
+      border-bottom: none;
+    }
+
+    .pdf-footer {
+      margin-top: 14px;
+      padding-top: 8px;
+      border-top: 1px dashed #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #64748b;
+    }
+
+    #printReportContainer {
+      display: none;
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 12mm;
+      }
+
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        display: block !important;
+        min-height: auto !important;
+      }
+
+      .app-shell,
+      .modal-backdrop,
+      .fullscreen-modal,
+      .toast {
+        display: none !important;
+      }
+
+      #printReportContainer {
+        display: block !important;
+        width: 100%;
+        background: #ffffff !important;
+        color: #0f172a !important;
+      }
+
+      .pdf-kpi-row {
+        grid-template-columns: repeat(4, 1fr) !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- ==================== TOP DAIRY HEADER ==================== -->
+    <header class="app-header">
+      <div class="header-top">
+        <div class="brand">
+          <div class="brand-mascot" title="Fresh Dairy Ledger">🥛</div>
+          <div style="min-width:0;">
+            <div class="brand-title">
+              <span>MilkBook</span>
+              <span style="font-size:13px;">🐄</span>
+            </div>
+            <div class="offline-badge">
+              <span class="status-dot"></span>
+              <span id="headerDairySubtitle">Fresh Cow Dairy</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button type="button" class="header-chip bouncy-btn" data-action="goto-settings" title="Default Milk Rate">
+            ₹<span id="headerRateVal">60</span>/L
+          </button>
+          <button type="button" class="theme-toggle-chip bouncy-btn" data-action="toggle-theme" title="Switch Day / Night Mode">
+            <span id="themeToggleIcon">🌙</span>
+            <span id="themeToggleLabel">Night</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Cute Milk Wave Bottom Border -->
+      <svg class="header-wave" viewBox="0 0 480 18" preserveAspectRatio="none">
+        <path d="M0,18 L0,6 Q60,18 120,6 T240,6 T360,6 T480,6 L480,18 Z" fill="var(--bg-app)"></path>
+      </svg>
+    </header>
+
+    <!-- ==================== TAB 1: TODAY'S DELIVERY ==================== -->
+    <main class="main-content view-animate" id="view-delivery">
+      <div class="card">
+        <!-- Date Navigation -->
+        <div class="date-bar">
+          <button type="button" class="icon-btn bouncy-btn" data-action="prev-date" aria-label="Previous Day">◀</button>
+          <div class="date-input-wrap">
+            <input type="date" id="deliveryDateInput" class="date-input" />
+          </div>
+          <button type="button" class="icon-btn bouncy-btn" data-action="next-date" aria-label="Next Day">▶</button>
+          <button type="button" class="today-chip-btn bouncy-btn" data-action="today-date">Today</button>
+        </div>
+
+        <!-- Shift Toggle Tabs -->
+        <div class="shift-toggle">
+          <button type="button" class="shift-tab active" id="tabShiftMorning" data-action="set-shift" data-shift="morning">
+            <span>☀️ Morning Shift</span>
+          </button>
+          <button type="button" class="shift-tab" id="tabShiftEvening" data-action="set-shift" data-shift="evening">
+            <span>🌙 Evening Shift</span>
+          </button>
+        </div>
+
+        <!-- Animated Progress Bar -->
+        <div class="progress-section">
+          <div class="progress-label-row">
+            <span id="progressCaptionText">☀️ Morning Route Progress</span>
+            <span id="progressPercentText">0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="shiftProgressBarFill"></div>
+          </div>
+        </div>
+
+        <!-- Shift Summary Bar -->
+        <div class="summary-strip">
+          <div class="stat-box">
+            <div class="stat-label">Delivered</div>
+            <div class="stat-val emerald" id="statShiftProgress">0 / 0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Shift Milk</div>
+            <div class="stat-val blue" id="statShiftLitres">0 L</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Full Day</div>
+            <div class="stat-val" id="statFullDayLitres">0 L</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search & Filter Controls -->
+      <div class="filter-controls">
+        <div class="search-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="deliverySearchInput" class="search-input" placeholder="Search customer by name..." />
+        </div>
+
+        <div class="pill-row">
+          <div class="filter-pills">
+            <button type="button" class="pill-btn active bouncy-btn" id="filterPillAll" data-action="set-delivery-filter" data-filter="all">All</button>
+            <button type="button" class="pill-btn bouncy-btn" id="filterPillPending" data-action="set-delivery-filter" data-filter="pending">Pending</button>
+            <button type="button" class="pill-btn bouncy-btn" id="filterPillDone" data-action="set-delivery-filter" data-filter="done">Done</button>
+          </div>
+          <button type="button" class="bulk-btn bouncy-btn" data-action="deliver-all-pending">⚡ Deliver All Pending</button>
+        </div>
+      </div>
+
+      <!-- Customer Delivery Cards -->
+      <div class="delivery-list" id="deliveryCardsContainer"></div>
+    </main>
+
+    <!-- ==================== TAB 2: CUSTOMERS & LEDGER ==================== -->
+    <main class="main-content hidden view-animate" id="view-customers">
+      <div class="due-banner">
+        <div>
+          <div class="due-banner-label">Total Pending Due</div>
+          <div class="due-banner-amount" id="totalAllCustomersDue">₹0</div>
+        </div>
+        <button type="button" class="btn-add-cust bouncy-btn" data-action="open-add-customer">
+          <span>+ Add Customer</span>
+        </button>
+      </div>
+
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="ledgerSearchInput" class="search-input" placeholder="Search customer name or phone..." />
+      </div>
+
+      <div class="filter-pills">
+        <button type="button" class="pill-btn active bouncy-btn" id="custListPillAll" data-action="set-cust-list-filter" data-filter="all">All Customers</button>
+        <button type="button" class="pill-btn bouncy-btn" id="custListPillDue" data-action="set-cust-list-filter" data-filter="due">Due Pending</button>
+        <button type="button" class="pill-btn bouncy-btn" id="custListPillSettled" data-action="set-cust-list-filter" data-filter="settled">Settled</button>
+      </div>
+
+      <div class="delivery-list" id="customersLedgerContainer"></div>
+    </main>
+
+    <!-- ==================== TAB 3: ANALYTICS & FLEXIBLE BUSINESS REPORTS ==================== -->
+    <main class="main-content hidden view-animate" id="view-analytics">
+      <!-- Flexible Timeframe Selector + Business PDF Report -->
+      <div class="analytics-hero">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div>
+            <div style="font-size:10.5px; text-transform:uppercase; letter-spacing:0.6px; color:#bae6fd; font-weight:800;">
+              🐄 Flexible Dairy Insights
+            </div>
+            <div style="font-size:18px; font-weight:800;">Analytics & Reports</div>
+          </div>
+          <span style="background:rgba(255,255,255,0.16); padding:4px 9px; border-radius:999px; font-size:11px; font-weight:800;" id="analyticsRangeBadge">
+            This Month
+          </span>
+        </div>
+
+        <!-- Quick Presets: Today (1 Day), 7 Days (1 Week), 15 Days, This Month, Last Month, All Time -->
+        <div class="range-presets-scroll" id="analyticsPresetsBar">
+          <button type="button" class="range-chip-hero bouncy-btn" data-action="analytics-preset" data-preset="today">Today (1 Day)</button>
+          <button type="button" class="range-chip-hero bouncy-btn" data-action="analytics-preset" data-preset="7days">Last 7 Days (Week)</button>
+          <button type="button" class="range-chip-hero bouncy-btn" data-action="analytics-preset" data-preset="15days">Last 15 Days</button>
+          <button type="button" class="range-chip-hero active bouncy-btn" data-action="analytics-preset" data-preset="this_month">This Month</button>
+          <button type="button" class="range-chip-hero bouncy-btn" data-action="analytics-preset" data-preset="last_month">Last Month</button>
+          <button type="button" class="range-chip-hero bouncy-btn" data-action="analytics-preset" data-preset="all_time">All Time</button>
+        </div>
+
+        <!-- Custom From Date -> To Date Pickers -->
+        <div class="from-to-grid">
+          <div class="from-to-box">
+            <label style="color:#bae6fd;">From Date</label>
+            <input type="date" id="analyticsFromDate" class="from-to-input-hero" />
+          </div>
+          <div class="from-to-box">
+            <label style="color:#bae6fd;">To Date</label>
+            <input type="date" id="analyticsToDate" class="from-to-input-hero" />
+          </div>
+        </div>
+
+        <button type="button" class="btn-pdf-hero bouncy-btn" data-action="open-business-pdf">
+          <span>📄 Save Business Report (PDF)</span>
+        </button>
+      </div>
+
+      <!-- 4 Executive KPI Cards -->
+      <div class="kpi-grid-2x2">
+        <div class="kpi-card">
+          <div class="kpi-icon-badge" style="background:var(--primary-soft); color:var(--primary);">🥛</div>
+          <div class="kpi-label">Milk Delivered</div>
+          <div class="kpi-value" style="color:var(--primary);" id="kpiTotalLitres">0 L</div>
+          <div class="kpi-footnote" id="kpiAvgDaily">Avg 0 L / day</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-badge" style="background:var(--indigo-soft); color:var(--indigo);">💰</div>
+          <div class="kpi-label">Period Billed</div>
+          <div class="kpi-value" style="color:var(--indigo);" id="kpiTotalBilled">₹0</div>
+          <div class="kpi-footnote" id="kpiActiveCustomers">0 active customers</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-badge" style="background:var(--emerald-soft); color:var(--emerald);">✅</div>
+          <div class="kpi-label">Period Collected</div>
+          <div class="kpi-value" style="color:var(--emerald);" id="kpiTotalCollected">₹0</div>
+          <div class="kpi-footnote" id="kpiCollectionRate">0% collection rate</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon-badge" style="background:var(--rose-soft); color:var(--rose);">⏳</div>
+          <div class="kpi-label">Overall Net Due</div>
+          <div class="kpi-value" style="color:var(--rose);" id="kpiTotalPending">₹0</div>
+          <div class="kpi-footnote" id="kpiDueCustCount">0 customers with due</div>
+        </div>
+      </div>
+
+      <!-- Morning vs Evening Shift Split Card -->
+      <div class="card">
+        <div class="card-header-row" style="margin-bottom:4px;">
+          <span class="card-title">Morning vs. Evening Split</span>
+          <span class="card-subtitle" id="shiftSplitTotalLabel">0 L Total</span>
+        </div>
+
+        <div class="split-bar-track">
+          <div class="split-bar-morning" id="splitBarMorning" style="width:50%;"></div>
+          <div class="split-bar-evening" id="splitBarEvening" style="width:50%;"></div>
+        </div>
+
+        <div class="split-legend">
+          <span style="color:var(--amber);" id="splitMorningText">☀️ Morning: 0 L (0%)</span>
+          <span style="color:var(--indigo);" id="splitEveningText">🌙 Evening: 0 L (0%)</span>
+        </div>
+      </div>
+
+      <!-- Daily Milk Delivery Trend Chart (Pure Inline SVG) -->
+      <div class="card">
+        <div class="card-header-row">
+          <div>
+            <div class="card-title">Daily Milk Delivery Trend</div>
+            <div class="card-subtitle" id="chartDateRangeSubtitle">Selected period daily volume</div>
+          </div>
+        </div>
+
+        <div class="svg-chart-wrap" id="dailyTrendSvgContainer"></div>
+
+        <div class="chart-meta-pills">
+          <div class="mini-pill" id="chartPeakDayPill">🏆 Peak Day: —</div>
+          <div class="mini-pill" id="chartActiveDaysPill">📅 Active Days: 0</div>
+        </div>
+      </div>
+
+      <!-- Customer-Wise Breakdown Table for Selected Range -->
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div style="padding:12px 14px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div class="card-title">Customer-Wise Summary</div>
+            <div class="card-subtitle">For selected From → To dates</div>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="ledger-table">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th class="num-right">Milk</th>
+                <th class="num-right">Bill</th>
+                <th class="num-right">Paid</th>
+                <th class="num-right">Net Due</th>
+                <th class="num-right">Bill</th>
+              </tr>
+            </thead>
+            <tbody id="analyticsCustomerTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- ==================== TAB 4: BACKUP & SETTINGS ==================== -->
+    <main class="main-content hidden view-animate" id="view-settings">
+      <!-- Theme & Storage Card -->
+      <div class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px;">
+          <div>
+            <h3 style="font-size:15px; font-weight:800;">Dairy Theme & Storage</h3>
+            <p style="font-size:12px; color:var(--emerald); font-weight:700; margin-top:2px;" id="storageEngineStatus">
+              ✓ IndexedDB + LocalStorage Active
+            </p>
+          </div>
+          <button type="button" class="pill-btn active bouncy-btn" id="btnSettingsThemeSwitch" data-action="toggle-theme">
+            🌙 Night Mode
+          </button>
+        </div>
+        <p style="font-size:12.5px; color:var(--text-muted);">
+          All customer entries, payments, and settings are auto-saved offline on your device.
+        </p>
+      </div>
+
+      <!-- Global Settings -->
+      <div class="card">
+        <h3 style="font-size:15px; font-weight:800; margin-bottom:12px;">Dairy & Invoice Details</h3>
+
+        <div class="form-group">
+          <label class="form-label">Dairy / Farm Name (Shown on PDF & WhatsApp Bills)</label>
+          <input type="text" id="settingDairyName" class="form-input" placeholder="e.g. Fresh Cow Dairy" />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Default Milk Rate (₹/L)</label>
+            <input type="number" id="settingDefaultRate" class="form-input" step="0.5" min="1" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dairy Phone Number</label>
+            <input type="tel" id="settingDairyPhone" class="form-input" placeholder="e.g. 9876543210" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">UPI ID for Customer Payments (Printed on Bills)</label>
+          <input type="text" id="settingDairyUpi" class="form-input" placeholder="e.g. freshdairy@upi" />
+        </div>
+
+        <button type="button" class="btn-primary-full bouncy-btn" data-action="save-settings">Save Settings</button>
+      </div>
+
+      <!-- Backup & Custom Date CSV Export -->
+      <div class="card" style="display:flex; flex-direction:column; gap:10px;">
+        <h3 style="font-size:15px; font-weight:800;">Backup & Custom CSV Export</h3>
+
+        <button type="button" class="btn-emerald-full bouncy-btn" data-action="download-backup">
+          ⬇️ Download Full Backup (.json)
+        </button>
+
+        <label class="btn-outline-full bouncy-btn" style="cursor:pointer;">
+          ⬆️ Restore Backup (.json)
+          <input type="file" id="restoreJsonInput" accept=".json" class="hidden" />
+        </label>
+
+        <div style="border-top:1px solid var(--border-color); padding-top:10px; margin-top:2px;">
+          <label class="form-label">Export Excel Report (.csv) for Custom Dates</label>
+          <div class="form-row-2" style="margin-bottom:8px;">
+            <div>
+              <span style="font-size:10px; font-weight:700; color:var(--text-faint);">FROM DATE</span>
+              <input type="date" id="exportCsvFromDate" class="from-to-input" />
+            </div>
+            <div>
+              <span style="font-size:10px; font-weight:700; color:var(--text-faint);">TO DATE</span>
+              <input type="date" id="exportCsvToDate" class="from-to-input" />
+            </div>
+          </div>
+          <button type="button" class="btn-primary-full bouncy-btn" data-action="export-csv">
+            📊 Export CSV for Selected Range
+          </button>
+        </div>
+      </div>
+
+      <!-- Demo & Reset -->
+      <div class="card" style="display:flex; flex-direction:column; gap:8px;">
+        <h3 style="font-size:14px; font-weight:800; color:var(--text-muted);">Sample Data & Reset</h3>
+        <button type="button" class="btn-outline-full bouncy-btn" data-action="load-demo-data">
+          ✨ Load 14-Day Realistic Demo Data
+        </button>
+        <button type="button" class="btn-outline-full bouncy-btn" style="color:var(--rose); border-color:var(--rose-border);" data-action="reset-all-data">
+          🗑️ Reset / Clear All Data
+        </button>
+      </div>
+    </main>
+
+    <!-- ==================== BOTTOM NAVIGATION (4 TABS) ==================== -->
+    <nav class="bottom-nav">
+      <button type="button" class="nav-item active" id="navBtn-delivery" data-action="switch-tab" data-tab="delivery">
+        <div class="nav-icon-wrap">
+          <span style="font-size:17px;">🥛</span>
+        </div>
+        <span>Delivery</span>
+      </button>
+
+      <button type="button" class="nav-item" id="navBtn-customers" data-action="switch-tab" data-tab="customers">
+        <div class="nav-icon-wrap">
+          <span style="font-size:17px;">🐄</span>
+        </div>
+        <span>Customers</span>
+      </button>
+
+      <button type="button" class="nav-item" id="navBtn-analytics" data-action="switch-tab" data-tab="analytics">
+        <div class="nav-icon-wrap">
+          <span style="font-size:17px;">📊</span>
+        </div>
+        <span>Analytics</span>
+      </button>
+
+      <button type="button" class="nav-item" id="navBtn-settings" data-action="switch-tab" data-tab="settings">
+        <div class="nav-icon-wrap">
+          <span style="font-size:17px;">⚙️</span>
+        </div>
+        <span>Settings</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ==================== MODAL: ADD / EDIT CUSTOMER ==================== -->
+  <div class="modal-backdrop hidden" id="customerModal">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3 class="modal-title" id="customerModalTitle">Add New Customer</h3>
+        <button type="button" class="close-btn" data-action="close-modal" data-modal="customerModal">✕</button>
+      </div>
+
+      <form id="customerForm">
+        <input type="hidden" id="editCustomerId" />
+
+        <div class="form-group">
+          <label class="form-label">Customer Name *</label>
+          <input type="text" id="custNameInput" class="form-input" placeholder="e.g. Rahul Sharma" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Delivery Schedule *</label>
+          <div class="schedule-grid">
+            <div class="sched-option selected" id="schedOpt-morning" data-action="select-schedule" data-sched="morning">
+              <span class="sched-option-icon">☀️</span>
+              <span class="sched-option-text">Morning Only</span>
+            </div>
+            <div class="sched-option" id="schedOpt-evening" data-action="select-schedule" data-sched="evening">
+              <span class="sched-option-icon">🌙</span>
+              <span class="sched-option-text">Evening Only</span>
+            </div>
+            <div class="sched-option" id="schedOpt-both" data-action="select-schedule" data-sched="both">
+              <span class="sched-option-icon">☀️🌙</span>
+              <span class="sched-option-text">Both Shifts</span>
+            </div>
+          </div>
+          <input type="hidden" id="custScheduleInput" value="morning" />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Default Qty (Litres) *</label>
+            <input type="number" id="custDefaultQtyInput" class="form-input" step="0.25" min="0.25" value="1" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Rate per Litre (₹) *</label>
+            <input type="number" id="custRateInput" class="form-input" step="0.5" min="1" value="60" required />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Phone (WhatsApp)</label>
+            <input type="tel" id="custPhoneInput" class="form-input" placeholder="9876543210" maxlength="13" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Opening / Previous Due (₹)</label>
+            <input type="number" id="custOpeningDueInput" class="form-input" step="1" value="0" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary-full bouncy-btn" style="margin-top:6px;">Save Customer</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: CUSTOM QUANTITY PICKER ==================== -->
+  <div class="modal-backdrop hidden" id="qtyModal">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="qtyModalTitle">Select Quantity</h3>
+          <p style="font-size:12px; color:var(--primary); font-weight:700;" id="qtyModalSubtitle">Morning • Today</p>
+        </div>
+        <button type="button" class="close-btn" data-action="close-modal" data-modal="qtyModal">✕</button>
+      </div>
+
+      <div class="qty-grid">
+        <button type="button" class="qty-preset bouncy-btn" data-action="pick-preset-qty" data-qty="0.25">0.25 L</button>
+        <button type="button" class="qty-preset bouncy-btn" data-action="pick-preset-qty" data-qty="0.5">0.5 L</button>
+        <button type="button" class="qty-preset bouncy-btn" data-action="pick-preset-qty" data-qty="1">1 L</button>
+        <button type="button" class="qty-preset bouncy-btn" data-action="pick-preset-qty" data-qty="1.5">1.5 L</button>
+        <button type="button" class="qty-preset bouncy-btn" data-action="pick-preset-qty" data-qty="2">2 L</button>
+        <button type="button" class="qty-preset bouncy-btn" data-action="pick-preset-qty" data-qty="2.5">2.5 L</button>
+        <button type="button" class="qty-preset bouncy-btn" data-action="pick-preset-qty" data-qty="3">3 L</button>
+        <button type="button" class="qty-preset bouncy-btn" data-action="pick-preset-qty" data-qty="5">5 L</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Or Enter Custom Quantity (Litres)</label>
+        <div style="display:flex; gap:8px;">
+          <input type="number" id="customQtyInput" class="form-input" step="0.05" min="0" placeholder="e.g. 1.25" style="text-align:center; font-size:17px; font-weight:800;" />
+          <button type="button" class="btn-primary-full bouncy-btn" style="width:110px;" data-action="save-custom-qty">Save</button>
+        </div>
+      </div>
+
+      <button type="button" class="btn-outline-full bouncy-btn" style="color:var(--rose); border-color:var(--rose-border);" data-action="pick-preset-qty" data-qty="0">
+        ✕ Mark Absent / Skip (0 L)
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== FULLSCREEN: CUSTOMER CUSTOM DATE-RANGE LEDGER & BILLING ==================== -->
+  <div class="fullscreen-modal hidden" id="ledgerDetailView">
+    <div class="fullscreen-inner">
+      <header class="app-header">
+        <div class="header-top">
+          <button type="button" class="header-chip bouncy-btn" data-action="close-ledger">
+            ← Back
+          </button>
+          <div style="text-align:center; min-width:0;">
+            <div class="brand-title" style="font-size:16px; justify-content:center;" id="ledgerHeaderName">Customer Name</div>
+            <div style="font-size:11px; color:#bae6fd; font-weight:600;" id="ledgerHeaderMeta">Morning Only • ₹60/L</div>
+          </div>
+          <button type="button" class="header-chip bouncy-btn" data-action="edit-current-customer">
+            ✏️ Edit
+          </button>
+        </div>
+      </header>
+
+      <div class="main-content">
+        <!-- Flexible Billing Period Selector (Presets + From Date -> To Date) -->
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:11.5px; font-weight:800; color:var(--text-faint); text-transform:uppercase;">
+              📅 Billing & Statement Period
+            </span>
+            <span style="font-size:11px; font-weight:800; color:var(--primary);" id="ledgerPeriodBadge">This Month</span>
+          </div>
+
+          <div class="range-presets-scroll" id="ledgerPresetsBar">
+            <button type="button" class="range-chip bouncy-btn" data-action="ledger-preset" data-preset="today">Today</button>
+            <button type="button" class="range-chip bouncy-btn" data-action="ledger-preset" data-preset="7days">Last 7 Days</button>
+            <button type="button" class="range-chip bouncy-btn" data-action="ledger-preset" data-preset="15days">Last 15 Days</button>
+            <button type="button" class="range-chip active bouncy-btn" data-action="ledger-preset" data-preset="this_month">This Month</button>
+            <button type="button" class="range-chip bouncy-btn" data-action="ledger-preset" data-preset="last_month">Last Month</button>
+            <button type="button" class="range-chip bouncy-btn" data-action="ledger-preset" data-preset="all_time">All Time</button>
+          </div>
+
+          <div class="from-to-grid">
+            <div class="from-to-box">
+              <label style="color:var(--text-faint);">From Date</label>
+              <input type="date" id="ledgerFromDate" class="from-to-input" />
+            </div>
+            <div class="from-to-box">
+              <label style="color:var(--text-faint);">To Date</label>
+              <input type="date" id="ledgerToDate" class="from-to-input" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial Summary & Clarity Card for Selected Date Range -->
+        <div class="card">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;">
+            <div>
+              <span style="font-size:11px; font-weight:800; color:var(--text-faint); text-transform:uppercase;">Closing Due (Till To-Date)</span>
+              <div style="font-size:25px; font-weight:800; margin-top:1px;" id="ledgerClosingBalance">₹0</div>
+            </div>
+            <div style="text-align:right;">
+              <span style="font-size:10.5px; font-weight:800; color:var(--text-faint); text-transform:uppercase;">Overall Net Due</span>
+              <div style="font-size:15px; font-weight:800; margin-top:2px;" id="ledgerOverallNetDue">₹0</div>
+            </div>
+          </div>
+
+          <div class="summary-strip" style="margin-top:0;">
+            <div class="stat-box">
+              <div class="stat-label">Period Milk</div>
+              <div class="stat-val blue" id="ledgerPeriodLitres">0 L</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Period Bill</div>
+              <div class="stat-val" id="ledgerPeriodBill">₹0</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Period Paid</div>
+              <div class="stat-val emerald" id="ledgerPeriodPaid">₹0</div>
+            </div>
+          </div>
+
+          <!-- Clear Step-by-Step Account Breakdown -->
+          <div class="clarity-box" id="ledgerAccountClarityBox"></div>
+
+          <!-- Action Buttons: Record Payment, WhatsApp Bill & Save PDF Invoice -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px;">
+            <button type="button" class="btn-emerald-full bouncy-btn" style="height:42px; font-size:13px;" data-action="open-payment-modal">
+              💵 Record Payment
+            </button>
+            <button type="button" class="btn-primary-full bouncy-btn" style="height:42px; font-size:13px; background:#16a34a;" data-action="send-whatsapp-bill">
+              📲 WhatsApp Bill
+            </button>
+          </div>
+          <button type="button" class="btn-primary-full bouncy-btn" style="height:43px; font-size:13.5px; margin-top:8px;" data-action="open-customer-pdf">
+            📄 View & Save PDF Bill (Selected Dates)
+          </button>
+        </div>
+
+        <!-- Date-by-Date Milk Table for Selected From -> To Range -->
+        <div class="card" style="padding:0; overflow:hidden;">
+          <div style="padding:12px 14px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:13.5px; font-weight:800;">Daily Milk Log (Selected Dates)</span>
+            <span style="font-size:11px; color:var(--text-faint); font-weight:600;">Tap any date to edit</span>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="ledger-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th class="num-right">Morning</th>
+                  <th class="num-right">Evening</th>
+                  <th class="num-right">Total</th>
+                  <th class="num-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="ledgerDatesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Payments History -->
+        <div class="card" style="padding:0; overflow:hidden;">
+          <div style="padding:12px 14px; border-bottom:1px solid var(--border-color);">
+            <span style="font-size:13.5px; font-weight:800;">All Payments History</span>
+          </div>
+          <div id="ledgerPaymentsList"></div>
+        </div>
+
+        <!-- Delete Customer -->
+        <button type="button" class="btn-outline-full bouncy-btn" style="color:var(--rose); border-color:var(--rose-border); margin-top:4px;" data-action="delete-current-customer">
+          🗑️ Delete Customer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: PDF REPORT & INVOICE PREVIEW ==================== -->
+  <div class="modal-backdrop hidden" id="pdfPreviewModal">
+    <div class="modal-sheet" style="max-width:520px;">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="pdfModalTitle">📄 PDF Invoice Preview</h3>
+          <p style="font-size:11.5px; color:var(--text-faint); font-weight:600;">Tap "Print / Save as PDF" below to save A4 PDF</p>
+        </div>
+        <button type="button" class="close-btn" data-action="close-modal" data-modal="pdfPreviewModal">✕</button>
+      </div>
+
+      <!-- Interactive Live A4 Preview Sheet -->
+      <div class="pdf-preview-paper" id="pdfPreviewPaperArea"></div>
+
+      <!-- Action Buttons -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px;">
+        <button type="button" class="btn-emerald-full bouncy-btn" data-action="trigger-print">
+          🖨️ Print / Save as PDF
+        </button>
+        <button type="button" class="btn-outline-full bouncy-btn" data-action="download-report-html">
+          ⬇️ Download Report File
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: RECORD PAYMENT ==================== -->
+  <div class="modal-backdrop hidden" id="paymentModal">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h3 class="modal-title">💵 Record Payment</h3>
+        <button type="button" class="close-btn" data-action="close-modal" data-modal="paymentModal">✕</button>
+      </div>
+
+      <form id="paymentForm">
+        <div class="form-group">
+          <label class="form-label">Amount Received (₹) *</label>
+          <input type="number" id="payAmountInput" class="form-input" step="1" min="1" placeholder="e.g. 1800" required style="font-size:20px; font-weight:800; color:var(--emerald);" />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Payment Mode</label>
+            <select id="payModeInput" class="form-input">
+              <option value="Cash">Cash</option>
+              <option value="UPI / GPay">UPI / GPay</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payment Date</label>
+            <input type="date" id="payDateInput" class="form-input" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Note (Optional)</label>
+          <input type="text" id="payNoteInput" class="form-input" placeholder="e.g. Week 1 bill cleared" />
+        </div>
+
+        <button type="submit" class="btn-emerald-full bouncy-btn">Save Payment</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: EDIT SINGLE DATE ENTRY ==================== -->
+  <div class="modal-backdrop hidden" id="editDayEntryModal">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title" id="editDayTitle">Edit Entry</h3>
+          <p style="font-size:12px; color:var(--text-faint);" id="editDaySubtitle">Date</p>
+        </div>
+        <button type="button" class="close-btn" data-action="close-modal" data-modal="editDayEntryModal">✕</button>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">☀️ Morning (Litres)</label>
+          <input type="number" id="editDayMorningInput" class="form-input" step="0.05" min="0" placeholder="Leave blank if none" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">🌙 Evening (Litres)</label>
+          <input type="number" id="editDayEveningInput" class="form-input" step="0.05" min="0" placeholder="Leave blank if none" />
+        </div>
+      </div>
+
+      <button type="button" class="btn-primary-full bouncy-btn" data-action="save-edited-day">Update Entry</button>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: CONFIRMATION DIALOG ==================== -->
+  <div class="modal-backdrop hidden" id="confirmModal" style="align-items:center; padding:16px;">
+    <div class="modal-sheet" style="border-radius:22px; max-width:340px; text-align:center;">
+      <h3 class="modal-title" id="confirmTitle">Are you sure?</h3>
+      <p style="font-size:13px; color:var(--text-muted); margin:10px 0 18px;" id="confirmMessage">Action cannot be undone.</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+        <button type="button" class="btn-outline-full bouncy-btn" data-action="close-modal" data-modal="confirmModal">Cancel</button>
+        <button type="button" class="btn-primary-full bouncy-btn" style="background:var(--rose);" id="confirmProceedBtn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Banner -->
+  <div class="toast hidden" id="toastEl">Saved</div>
+
+  <!-- Dedicated A4 Print Container -->
+  <div id="printReportContainer"></div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      // =========================================================================
+      // 1. DUAL-LAYER OFFLINE STORAGE ENGINE (IndexedDB + localStorage)
+      // =========================================================================
+      const DB_NAME = "MilkBookOfflineDB_v3";
+      const DB_STORE = "milkbookStore";
+      const DB_KEY = "masterState";
+      const LS_KEY = "milkbook_offline_state_v3";
+      const LEGACY_LS_KEY = "milkbook_offline_state_v2";
+
+      let dbHandle = null;
+      let state = {
+        dairyName: "Fresh Cow Dairy",
+        dairyPhone: "",
+        dairyUpi: "",
+        defaultRate: 60,
+        darkMode: false,
+        updatedAt: 0,
+        customers: [],
+        entries: {},
+        payments: []
+      };
+
+      let currentTab = "delivery";
+      let currentShift = "morning";
+      let currentDeliveryFilter = "all";
+      let currentCustListFilter = "all";
+      let activeQtyModalCustId = null;
+      let activeLedgerCustId = null;
+      let activeEditDateKey = null;
+      let currentPdfFilename = "MilkBook_Report";
+
+      function openIDB() {
+        return new Promise((resolve) => {
+          if (!window.indexedDB) return resolve(null);
+          try {
+            const req = indexedDB.open(DB_NAME, 1);
+            req.onupgradeneeded = (e) => {
+              const db = e.target.result;
+              if (!db.objectStoreNames.contains(DB_STORE)) {
+                db.createObjectStore(DB_STORE);
+              }
+            };
+            req.onsuccess = (e) => {
+              dbHandle = e.target.result;
+              resolve(dbHandle);
+            };
+            req.onerror = () => resolve(null);
+          } catch (err) {
+            resolve(null);
+          }
+        });
+      }
+
+      async function loadPersistentData() {
+        await openIDB();
+
+        let idbState = null;
+        if (dbHandle) {
+          idbState = await new Promise((resolve) => {
+            try {
+              const tx = dbHandle.transaction(DB_STORE, "readonly");
+              const req = tx.objectStore(DB_STORE).get(DB_KEY);
+              req.onsuccess = () => resolve(req.result || null);
+              req.onerror = () => resolve(null);
+            } catch (e) {
+              resolve(null);
+            }
+          });
+        }
+
+        let lsState = null;
+        try {
+          const raw = localStorage.getItem(LS_KEY) || localStorage.getItem(LEGACY_LS_KEY);
+          if (raw) lsState = JSON.parse(raw);
+        } catch (e) {
+          lsState = null;
+        }
+
+        let freshest = null;
+        if (idbState && lsState) {
+          freshest = (idbState.updatedAt || 0) >= (lsState.updatedAt || 0) ? idbState : lsState;
+        } else {
+          freshest = idbState || lsState;
+        }
+
+        if (freshest && Array.isArray(freshest.customers)) {
+          state = {
+            dairyName: freshest.dairyName || "Fresh Cow Dairy",
+            dairyPhone: freshest.dairyPhone || freshest.dairyContact || "",
+            dairyUpi: freshest.dairyUpi || "",
+            defaultRate: parseFloat(freshest.defaultRate) || 60,
+            darkMode: Boolean(freshest.darkMode),
+            updatedAt: freshest.updatedAt || Date.now(),
+            customers: freshest.customers,
+            entries: freshest.entries || {},
+            payments: Array.isArray(freshest.payments) ? freshest.payments : []
+          };
+        } else {
+          seedRealistic14DayDemoData(false);
+        }
+
+        applyThemeClass();
+        await savePersistentData();
+      }
+
+      async function savePersistentData() {
+        state.updatedAt = Date.now();
+        const serialized = JSON.stringify(state);
+
+        try {
+          localStorage.setItem(LS_KEY, serialized);
+        } catch (e) {
+          console.warn("localStorage warning:", e);
+        }
+
+        if (dbHandle) {
+          try {
+            await new Promise((resolve) => {
+              const tx = dbHandle.transaction(DB_STORE, "readwrite");
+              tx.objectStore(DB_STORE).put(JSON.parse(serialized), DB_KEY);
+              tx.oncomplete = () => resolve(true);
+              tx.onerror = () => resolve(false);
+            });
+          } catch (e) {
+            console.warn("IndexedDB warning:", e);
+          }
+        }
+
+        updateHeaderIndicators();
+      }
+
+      function applyThemeClass() {
+        document.body.classList.toggle("dark-mode", Boolean(state.darkMode));
+        const iconEl = document.getElementById("themeToggleIcon");
+        const labelEl = document.getElementById("themeToggleLabel");
+        const settingsBtn = document.getElementById("btnSettingsThemeSwitch");
+
+        if (state.darkMode) {
+          if (iconEl) iconEl.textContent = "☀️";
+          if (labelEl) labelEl.textContent = "Day";
+          if (settingsBtn) settingsBtn.textContent = "☀️ Switch to Day Mode";
+        } else {
+          if (iconEl) iconEl.textContent = "🌙";
+          if (labelEl) labelEl.textContent = "Night";
+          if (settingsBtn) settingsBtn.textContent = "🌙 Switch to Night Mode";
+        }
+      }
+
+      async function toggleDarkMode() {
+        state.darkMode = !state.darkMode;
+        applyThemeClass();
+        await savePersistentData();
+        if (currentTab === "analytics") renderAnalyticsView();
+        showToast(state.darkMode ? "🌙 Night Barn Mode On" : "☀️ Fresh Day Mode On");
+      }
+
+      function updateHeaderIndicators() {
+        document.getElementById("headerRateVal").textContent = state.defaultRate;
+        document.getElementById("headerDairySubtitle").textContent = state.dairyName || "Fresh Cow Dairy";
+        const engineEl = document.getElementById("storageEngineStatus");
+        if (engineEl) {
+          engineEl.textContent = dbHandle
+            ? "✓ IndexedDB + LocalStorage Active"
+            : "✓ LocalStorage Active";
+        }
+      }
+
+      // =========================================================================
+      // 2. DATE RANGE & FORMATTING HELPERS
+      // =========================================================================
+      function toLocalISO(dateObj) {
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, "0");
+        const d = String(dateObj.getDate()).padStart(2, "0");
+        return `${y}-${m}-${d}`;
+      }
+
+      function parseLocalISO(isoStr) {
+        const [y, m, d] = isoStr.split("-").map(Number);
+        return new Date(y, m - 1, d);
+      }
+
+      function getTodayISO() {
+        return toLocalISO(new Date());
+      }
+
+      function addDaysISO(isoStr, deltaDays) {
+        const dt = parseLocalISO(isoStr);
+        dt.setDate(dt.getDate() + deltaDays);
+        return toLocalISO(dt);
+      }
+
+      function enumerateDatesInclusive(fromISO, toISO) {
+        const start = fromISO <= toISO ? fromISO : toISO;
+        const end = fromISO <= toISO ? toISO : fromISO;
+        const list = [];
+        let cursor = parseLocalISO(start);
+        const endDate = parseLocalISO(end);
+        let guard = 0;
+
+        while (cursor <= endDate && guard < 1500) {
+          list.push(toLocalISO(cursor));
+          cursor.setDate(cursor.getDate() + 1);
+          guard++;
+        }
+        return list;
+      }
+
+      function getEarliestRecordDate() {
+        let earliest = getTodayISO();
+        Object.keys(state.entries).forEach((d) => {
+          if (d < earliest) earliest = d;
+        });
+        state.payments.forEach((p) => {
+          if (p.date && p.date < earliest) earliest = p.date;
+        });
+        return earliest;
+      }
+
+      function computePresetRange(preset) {
+        const today = getTodayISO();
+        const now = new Date();
+
+        if (preset === "today") {
+          return { from: today, to: today, label: "Today (1 Day)" };
+        }
+        if (preset === "7days") {
+          return { from: addDaysISO(today, -6), to: today, label: "Last 7 Days (1 Week)" };
+        }
+        if (preset === "15days") {
+          return { from: addDaysISO(today, -14), to: today, label: "Last 15 Days" };
+        }
+        if (preset === "this_month") {
+          const first = new Date(now.getFullYear(), now.getMonth(), 1);
+          const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+          return { from: toLocalISO(first), to: toLocalISO(last), label: "This Month" };
+        }
+        if (preset === "last_month") {
+          const first = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+          const last = new Date(now.getFullYear(), now.getMonth(), 0);
+          return { from: toLocalISO(first), to: toLocalISO(last), label: "Last Month" };
+        }
+        if (preset === "all_time") {
+          return { from: getEarliestRecordDate(), to: today, label: "All Time" };
+        }
+        return { from: today, to: today, label: "Custom Range" };
+      }
+
+      function formatDateShort(isoDate) {
+        if (!isoDate) return "";
+        const [y, m, d] = isoDate.split("-");
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return `${d} ${months[parseInt(m, 10) - 1]} ${y}`;
+      }
+
+      function formatDayMonthOnly(isoDate) {
+        if (!isoDate) return "";
+        const [, m, d] = isoDate.split("-");
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return `${d} ${months[parseInt(m, 10) - 1]}`;
+      }
+
+      function formatRangeLabel(fromISO, toISO) {
+        if (fromISO === toISO) return formatDateShort(fromISO);
+        return `${formatDateShort(fromISO)} to ${formatDateShort(toISO)}`;
+      }
+
+      function escapeHTML(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function showToast(msg) {
+        const el = document.getElementById("toastEl");
+        el.textContent = msg;
+        el.classList.remove("hidden");
+        clearTimeout(window._toastTimer);
+        window._toastTimer = setTimeout(() => {
+          el.classList.add("hidden");
+        }, 2200);
+      }
+
+      function openModal(id) {
+        document.getElementById(id).classList.remove("hidden");
+      }
+
+      function closeModal(id) {
+        document.getElementById(id).classList.add("hidden");
+      }
+
+      function askConfirm(title, message, onConfirm) {
+        document.getElementById("confirmTitle").textContent = title;
+        document.getElementById("confirmMessage").textContent = message;
+        document.getElementById("confirmProceedBtn").onclick = () => {
+          closeModal("confirmModal");
+          onConfirm();
+        };
+        openModal("confirmModal");
+      }
+
+      function getScheduleLabel(sched) {
+        if (sched === "morning") return "☀️ Morning Only";
+        if (sched === "evening") return "🌙 Evening Only";
+        return "☀️🌙 Both Shifts";
+      }
+
+      function getSchedulePlainText(sched) {
+        if (sched === "morning") return "Morning Only";
+        if (sched === "evening") return "Evening Only";
+        return "Morning & Evening";
+      }
+
+      // =========================================================================
+      // 3. TAB SWITCHING
+      // =========================================================================
+      function switchTab(tab) {
+        currentTab = tab;
+        ["delivery", "customers", "analytics", "settings"].forEach((t) => {
+          const viewEl = document.getElementById("view-" + t);
+          const navEl = document.getElementById("navBtn-" + t);
+          if (t === tab) {
+            viewEl.classList.remove("hidden");
+            viewEl.classList.remove("view-animate");
+            void viewEl.offsetWidth;
+            viewEl.classList.add("view-animate");
+          } else {
+            viewEl.classList.add("hidden");
+          }
+          navEl.classList.toggle("active", t === tab);
+        });
+
+        if (tab === "delivery") renderDeliveryView();
+        if (tab === "customers") renderCustomersListView();
+        if (tab === "analytics") renderAnalyticsView();
+        if (tab === "settings") {
+          document.getElementById("settingDairyName").value = state.dairyName;
+          document.getElementById("settingDairyPhone").value = state.dairyPhone || "";
+          document.getElementById("settingDairyUpi").value = state.dairyUpi || "";
+          document.getElementById("settingDefaultRate").value = state.defaultRate;
+        }
+      }
+
+      // =========================================================================
+      // 4. TODAY'S DELIVERY VIEW
+      // =========================================================================
+      function changeDeliveryDate(delta) {
+        const input = document.getElementById("deliveryDateInput");
+        const cur = input.value || getTodayISO();
+        input.value = addDaysISO(cur, delta);
+        renderDeliveryView();
+      }
+
+      function setDeliveryShift(shift) {
+        currentShift = shift;
+        document.getElementById("tabShiftMorning").classList.toggle("active", shift === "morning");
+        document.getElementById("tabShiftEvening").classList.toggle("active", shift === "evening");
+        renderDeliveryView();
+      }
+
+      function setDeliveryFilter(filter) {
+        currentDeliveryFilter = filter;
+        ["all", "pending", "done"].forEach((f) => {
+          const cap = f.charAt(0).toUpperCase() + f.slice(1);
+          document.getElementById("filterPill" + cap).classList.toggle("active", f === filter);
+        });
+        renderDeliveryView();
+      }
+
+      function renderDeliveryView() {
+        const dateStr = document.getElementById("deliveryDateInput").value || getTodayISO();
+        const query = (document.getElementById("deliverySearchInput").value || "").toLowerCase().trim();
+        const dayEntries = state.entries[dateStr] || {};
+
+        const shiftCustomers = state.customers.filter((c) => {
+          const sched = c.schedule || "both";
+          return sched === currentShift || sched === "both";
+        });
+
+        let doneCount = 0;
+        let shiftLitres = 0;
+
+        shiftCustomers.forEach((c) => {
+          const rec = dayEntries[c.id];
+          if (rec && rec[currentShift] !== undefined && rec[currentShift] !== null) {
+            doneCount++;
+            shiftLitres += parseFloat(rec[currentShift]) || 0;
+          }
+        });
+
+        let fullDayLitres = 0;
+        Object.values(dayEntries).forEach((rec) => {
+          if (rec) {
+            fullDayLitres += (parseFloat(rec.morning) || 0) + (parseFloat(rec.evening) || 0);
+          }
+        });
+
+        const totalShiftCust = shiftCustomers.length;
+        const pct = totalShiftCust > 0 ? Math.round((doneCount / totalShiftCust) * 100) : 0;
+
+        document.getElementById("progressCaptionText").textContent =
+          `${currentShift === "morning" ? "☀️ Morning" : "🌙 Evening"} Route Progress`;
+        document.getElementById("progressPercentText").textContent = `${pct}%`;
+
+        const fillEl = document.getElementById("shiftProgressBarFill");
+        fillEl.style.width = `${pct}%`;
+        fillEl.classList.toggle("complete", totalShiftCust > 0 && doneCount === totalShiftCust);
+
+        document.getElementById("statShiftProgress").textContent = `${doneCount} / ${totalShiftCust}`;
+        document.getElementById("statShiftLitres").textContent = `${parseFloat(shiftLitres.toFixed(2))} L`;
+        document.getElementById("statFullDayLitres").textContent = `${parseFloat(fullDayLitres.toFixed(2))} L`;
+
+        const visibleCustomers = shiftCustomers.filter((c) => {
+          if (query && !c.name.toLowerCase().includes(query)) return false;
+          const rec = dayEntries[c.id];
+          const isLogged = rec && rec[currentShift] !== undefined && rec[currentShift] !== null;
+          if (currentDeliveryFilter === "pending" && isLogged) return false;
+          if (currentDeliveryFilter === "done" && !isLogged) return false;
+          return true;
+        });
+
+        const container = document.getElementById("deliveryCardsContainer");
+
+        if (shiftCustomers.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div style="font-size:36px;">${currentShift === "morning" ? "☀️🐄" : "🌙🐄"}</div>
+              <h3>No ${currentShift === "morning" ? "Morning" : "Evening"} Customers</h3>
+              <p>Add customers scheduled for ${currentShift} milk delivery.</p>
+              <button type="button" class="btn-add-cust bouncy-btn" style="margin-top:14px;" data-action="open-add-customer">+ Add Customer</button>
+            </div>
+          `;
+          return;
+        }
+
+        if (visibleCustomers.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div style="font-size:30px;">🔍</div>
+              <h3>No matching customers</h3>
+              <p>Try clearing your search or switching filter pills.</p>
+            </div>
+          `;
+          return;
+        }
+
+        let html = "";
+        visibleCustomers.forEach((c, idx) => {
+          const rec = dayEntries[c.id];
+          const hasEntry = rec && rec[currentShift] !== undefined && rec[currentShift] !== null;
+          const val = hasEntry ? parseFloat(rec[currentShift]) : null;
+          const defQty = parseFloat(c.defaultQty) || 1;
+          const rate = parseFloat(c.rate) || state.defaultRate;
+          const initials = c.name.trim().slice(0, 2).toUpperCase();
+
+          let cardClass = "cust-card card-stagger";
+          let statusTag = `<span class="status-tag pending">Pending</span>`;
+          let primaryBtn = `
+            <button type="button" class="btn-deliver bouncy-btn" data-action="deliver-milk" data-id="${c.id}" data-qty="${defQty}">
+              🥛 + ${defQty} L
+            </button>
+          `;
+
+          if (hasEntry && val > 0) {
+            cardClass += " state-done";
+            statusTag = `<span class="status-tag done">✓ ${val} L Delivered</span>`;
+            primaryBtn = `
+              <button type="button" class="btn-deliver logged bouncy-btn" data-action="open-qty-picker" data-id="${c.id}">
+                ✓ ${val} L Logged
+              </button>
+            `;
+          } else if (hasEntry && val === 0) {
+            cardClass += " state-skipped";
+            statusTag = `<span class="status-tag skipped">Skipped (0 L)</span>`;
+            primaryBtn = `
+              <button type="button" class="btn-deliver bouncy-btn" data-action="deliver-milk" data-id="${c.id}" data-qty="${defQty}">
+                🥛 + ${defQty} L
+              </button>
+            `;
+          }
+
+          html += `
+            <div class="${cardClass}" style="animation-delay:${Math.min(idx * 25, 200)}ms;">
+              <div class="cust-card-top">
+                <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1; cursor:pointer;" data-action="open-ledger" data-id="${c.id}">
+                  <div class="cust-avatar">${escapeHTML(initials)}</div>
+                  <div class="cust-info">
+                    <div class="cust-name-row">
+                      <span class="cust-name">${escapeHTML(c.name)}</span>
+                      <span class="sched-badge ${c.schedule}">${getScheduleLabel(c.schedule)}</span>
+                    </div>
+                    <div class="cust-meta">Default: ${defQty} L • ₹${rate}/L</div>
+                  </div>
+                </div>
+                ${statusTag}
+              </div>
+
+              <div class="cust-card-actions">
+                ${primaryBtn}
+                <button type="button" class="btn-qty bouncy-btn" data-action="open-qty-picker" data-id="${c.id}">Qty ▾</button>
+                <button type="button" class="btn-skip bouncy-btn ${hasEntry && val === 0 ? "active-skip" : ""}" data-action="skip-milk" data-id="${c.id}">
+                  Skip
+                </button>
+                ${
+                  hasEntry
+                    ? `<button type="button" class="btn-undo bouncy-btn" data-action="undo-milk" data-id="${c.id}" title="Undo Entry">Undo</button>`
+                    : ""
+                }
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      }
+
+      async function logMilkDelivery(custId, qty) {
+        const dateStr = document.getElementById("deliveryDateInput").value || getTodayISO();
+        if (!state.entries[dateStr]) state.entries[dateStr] = {};
+        if (!state.entries[dateStr][custId]) state.entries[dateStr][custId] = {};
+
+        state.entries[dateStr][custId][currentShift] = parseFloat(qty);
+
+        await savePersistentData();
+        renderDeliveryView();
+
+        const cust = state.customers.find((c) => c.id === custId);
+        if (cust) {
+          showToast(qty > 0 ? `🥛 ${cust.name}: ${qty} L logged` : `${cust.name}: Marked Skipped (0 L)`);
+        }
+      }
+
+      async function clearMilkEntry(custId) {
+        const dateStr = document.getElementById("deliveryDateInput").value || getTodayISO();
+        if (state.entries[dateStr] && state.entries[dateStr][custId]) {
+          delete state.entries[dateStr][custId][currentShift];
+          if (Object.keys(state.entries[dateStr][custId]).length === 0) {
+            delete state.entries[dateStr][custId];
+          }
+          if (Object.keys(state.entries[dateStr]).length === 0) {
+            delete state.entries[dateStr];
+          }
+        }
+        await savePersistentData();
+        renderDeliveryView();
+        showToast("↩️ Entry undone");
+      }
+
+      async function markAllPendingDelivered() {
+        const dateStr = document.getElementById("deliveryDateInput").value || getTodayISO();
+        if (!state.entries[dateStr]) state.entries[dateStr] = {};
+
+        let updatedCount = 0;
+        state.customers.forEach((c) => {
+          const sched = c.schedule || "both";
+          if (sched !== currentShift && sched !== "both") return;
+
+          if (!state.entries[dateStr][c.id]) state.entries[dateStr][c.id] = {};
+          if (state.entries[dateStr][c.id][currentShift] === undefined || state.entries[dateStr][c.id][currentShift] === null) {
+            state.entries[dateStr][c.id][currentShift] = parseFloat(c.defaultQty) || 1;
+            updatedCount++;
+          }
+        });
+
+        if (updatedCount === 0) {
+          showToast("✨ All deliveries in this shift are already done!");
+          return;
+        }
+
+        await savePersistentData();
+        renderDeliveryView();
+        showToast(`⚡ Marked ${updatedCount} deliveries done!`);
+      }
+
+      // =========================================================================
+      // 5. CUSTOM QUANTITY PICKER MODAL
+      // =========================================================================
+      function openQtyPicker(custId) {
+        const cust = state.customers.find((c) => c.id === custId);
+        if (!cust) return;
+        activeQtyModalCustId = custId;
+
+        const dateStr = document.getElementById("deliveryDateInput").value || getTodayISO();
+        const existing = state.entries[dateStr]?.[custId]?.[currentShift];
+
+        document.getElementById("qtyModalTitle").textContent = `🥛 ${cust.name}`;
+        document.getElementById("qtyModalSubtitle").textContent = `${
+          currentShift === "morning" ? "☀️ Morning" : "🌙 Evening"
+        } • ${formatDateShort(dateStr)}`;
+        document.getElementById("customQtyInput").value =
+          existing !== undefined && existing !== null ? existing : cust.defaultQty;
+
+        openModal("qtyModal");
+      }
+
+      async function applyPickedQty(qty) {
+        if (!activeQtyModalCustId) return;
+        await logMilkDelivery(activeQtyModalCustId, qty);
+        closeModal("qtyModal");
+      }
+
+      async function applyCustomQtyInput() {
+        const val = parseFloat(document.getElementById("customQtyInput").value);
+        if (isNaN(val) || val < 0) {
+          showToast("Enter a valid quantity");
+          return;
+        }
+        await applyPickedQty(val);
+      }
+
+      // =========================================================================
+      // 6. CORE DATE-RANGE FINANCIAL ENGINE (SUPPORTS ANY FROM -> TO RANGE!)
+      // =========================================================================
+      function calculateCustomerRangeSummary(cust, fromISO, toISO) {
+        const start = fromISO <= toISO ? fromISO : toISO;
+        const end = fromISO <= toISO ? toISO : fromISO;
+        const rate = parseFloat(cust.rate) || state.defaultRate;
+        const openingDue = parseFloat(cust.openingDue) || 0;
+
+        let beforeRangeBill = 0;
+        let rangeMorningLitres = 0;
+        let rangeEveningLitres = 0;
+        let rangeLitres = 0;
+        let rangeBill = 0;
+        let activeDeliveryDays = 0;
+        let allTimeBill = 0;
+
+        for (const dateKey in state.entries) {
+          const rec = state.entries[dateKey]?.[cust.id];
+          if (rec) {
+            const m = parseFloat(rec.morning) || 0;
+            const e = parseFloat(rec.evening) || 0;
+            const dayTot = m + e;
+            const dayCost = dayTot * rate;
+
+            allTimeBill += dayCost;
+
+            if (dateKey < start) {
+              beforeRangeBill += dayCost;
+            } else if (dateKey >= start && dateKey <= end) {
+              rangeMorningLitres += m;
+              rangeEveningLitres += e;
+              rangeLitres += dayTot;
+              rangeBill += dayCost;
+              if (dayTot > 0) activeDeliveryDays++;
+            }
+          }
+        }
+
+        let beforeRangePaid = 0;
+        let rangePaid = 0;
+        let allTimePaid = 0;
+
+        state.payments.forEach((p) => {
+          if (p.custId === cust.id) {
+            const amt = parseFloat(p.amount) || 0;
+            allTimePaid += amt;
+            if (p.date < start) {
+              beforeRangePaid += amt;
+            } else if (p.date >= start && p.date <= end) {
+              rangePaid += amt;
+            }
+          }
+        });
+
+        const openingBalanceBeforeRange = Math.round(openingDue + beforeRangeBill - beforeRangePaid);
+        const closingBalanceAtEnd = Math.round(openingBalanceBeforeRange + rangeBill - rangePaid);
+        const overallNetDue = Math.round(openingDue + allTimeBill - allTimePaid);
+
+        return {
+          rate,
+          start,
+          end,
+          openingBalanceBeforeRange,
+          rangeMorningLitres: parseFloat(rangeMorningLitres.toFixed(2)),
+          rangeEveningLitres: parseFloat(rangeEveningLitres.toFixed(2)),
+          rangeLitres: parseFloat(rangeLitres.toFixed(2)),
+          rangeBill: Math.round(rangeBill),
+          rangePaid: Math.round(rangePaid),
+          closingBalanceAtEnd,
+          overallNetDue,
+          activeDeliveryDays
+        };
+      }
+
+      // =========================================================================
+      // 7. CUSTOMERS LIST TAB
+      // =========================================================================
+      function setCustListFilter(filter) {
+        currentCustListFilter = filter;
+        ["all", "due", "settled"].forEach((f) => {
+          const cap = f.charAt(0).toUpperCase() + f.slice(1);
+          document.getElementById("custListPill" + cap).classList.toggle("active", f === filter);
+        });
+        renderCustomersListView();
+      }
+
+      function renderCustomersListView() {
+        const query = (document.getElementById("ledgerSearchInput").value || "").toLowerCase().trim();
+        const today = getTodayISO();
+        let grandPending = 0;
+
+        const enriched = state.customers.map((c) => {
+          const sum = calculateCustomerRangeSummary(c, today, today);
+          if (sum.overallNetDue > 0) grandPending += sum.overallNetDue;
+          return { cust: c, sum };
+        });
+
+        document.getElementById("totalAllCustomersDue").textContent = `₹${grandPending.toLocaleString("en-IN")}`;
+
+        const filtered = enriched.filter(({ cust, sum }) => {
+          if (query) {
+            const matchName = cust.name.toLowerCase().includes(query);
+            const matchPhone = (cust.phone || "").toLowerCase().includes(query);
+            if (!matchName && !matchPhone) return false;
+          }
+          if (currentCustListFilter === "due" && sum.overallNetDue <= 0) return false;
+          if (currentCustListFilter === "settled" && sum.overallNetDue > 0) return false;
+          return true;
+        });
+
+        const container = document.getElementById("customersLedgerContainer");
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div style="font-size:36px;">🐄📒</div>
+              <h3>No Customers Found</h3>
+              <p>Tap "+ Add Customer" above or clear your filter.</p>
+            </div>
+          `;
+          return;
+        }
+
+        let html = "";
+        filtered.forEach(({ cust, sum }, idx) => {
+          const isDue = sum.overallNetDue > 0;
+          const initials = cust.name.trim().slice(0, 2).toUpperCase();
+          const balText = isDue
+            ? `₹${sum.overallNetDue.toLocaleString("en-IN")}`
+            : sum.overallNetDue < 0
+            ? `₹${Math.abs(sum.overallNetDue).toLocaleString("en-IN")} Adv`
+            : "₹0";
+
+          html += `
+            <div class="ledger-cust-card card-stagger bouncy-btn" style="animation-delay:${Math.min(idx * 25, 200)}ms;" data-action="open-ledger" data-id="${cust.id}">
+              <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1;">
+                <div class="cust-avatar">${escapeHTML(initials)}</div>
+                <div style="min-width:0; flex:1;">
+                  <div class="cust-name-row">
+                    <span class="cust-name">${escapeHTML(cust.name)}</span>
+                    <span class="sched-badge ${cust.schedule}">${getScheduleLabel(cust.schedule)}</span>
+                  </div>
+                  <div class="cust-meta">
+                    ${cust.defaultQty} L / shift • ₹${sum.rate}/L ${cust.phone ? "• " + escapeHTML(cust.phone) : ""}
+                  </div>
+                </div>
+              </div>
+              <div class="balance-pill">
+                <div class="balance-val ${isDue ? "due" : "clear"}">${balText}</div>
+                <div class="balance-sub">${isDue ? "Pending Due" : "Settled"}</div>
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      }
+
+      function selectScheduleOption(sched) {
+        document.getElementById("custScheduleInput").value = sched;
+        ["morning", "evening", "both"].forEach((s) => {
+          document.getElementById("schedOpt-" + s).classList.toggle("selected", s === sched);
+        });
+      }
+
+      function openCustomerModal(custToEdit = null) {
+        if (custToEdit) {
+          document.getElementById("customerModalTitle").textContent = "✏️ Edit Customer";
+          document.getElementById("editCustomerId").value = custToEdit.id;
+          document.getElementById("custNameInput").value = custToEdit.name;
+          selectScheduleOption(custToEdit.schedule || "both");
+          document.getElementById("custDefaultQtyInput").value = custToEdit.defaultQty;
+          document.getElementById("custRateInput").value = custToEdit.rate;
+          document.getElementById("custPhoneInput").value = custToEdit.phone || "";
+          document.getElementById("custOpeningDueInput").value = custToEdit.openingDue || 0;
+        } else {
+          document.getElementById("customerModalTitle").textContent = "🐄 Add New Customer";
+          document.getElementById("editCustomerId").value = "";
+          document.getElementById("custNameInput").value = "";
+          selectScheduleOption("morning");
+          document.getElementById("custDefaultQtyInput").value = 1;
+          document.getElementById("custRateInput").value = state.defaultRate;
+          document.getElementById("custPhoneInput").value = "";
+          document.getElementById("custOpeningDueInput").value = 0;
+        }
+        openModal("customerModal");
+      }
+
+      async function saveCustomerForm(e) {
+        e.preventDefault();
+        const id = document.getElementById("editCustomerId").value;
+        const name = document.getElementById("custNameInput").value.trim();
+        const schedule = document.getElementById("custScheduleInput").value;
+        const defaultQty = parseFloat(document.getElementById("custDefaultQtyInput").value) || 1;
+        const rate = parseFloat(document.getElementById("custRateInput").value) || state.defaultRate;
+        const phone = document.getElementById("custPhoneInput").value.trim();
+        const openingDue = parseFloat(document.getElementById("custOpeningDueInput").value) || 0;
+
+        if (!name) return;
+
+        if (id) {
+          const idx = state.customers.findIndex((c) => c.id === id);
+          if (idx !== -1) {
+            state.customers[idx] = { id, name, schedule, defaultQty, rate, phone, openingDue };
+          }
+          showToast("✓ Customer updated");
+        } else {
+          state.customers.push({
+            id: "cust_" + Date.now(),
+            name,
+            schedule,
+            defaultQty,
+            rate,
+            phone,
+            openingDue
+          });
+          showToast("🐄 Customer added!");
+        }
+
+        await savePersistentData();
+        closeModal("customerModal");
+        renderDeliveryView();
+        renderCustomersListView();
+        if (currentTab === "analytics") renderAnalyticsView();
+        if (activeLedgerCustId) renderLedgerDetail();
+      }
+
+      // =========================================================================
+      // 8. CUSTOMER CUSTOM DATE-RANGE LEDGER & BILLING VIEW
+      // =========================================================================
+      function applyLedgerPreset(preset) {
+        const range = computePresetRange(preset);
+        document.getElementById("ledgerFromDate").value = range.from;
+        document.getElementById("ledgerToDate").value = range.to;
+        document.getElementById("ledgerPeriodBadge").textContent = range.label;
+
+        document.querySelectorAll("#ledgerPresetsBar .range-chip").forEach((btn) => {
+          btn.classList.toggle("active", btn.getAttribute("data-preset") === preset);
+        });
+
+        renderLedgerDetail();
+      }
+
+      function onLedgerCustomDateChanged() {
+        document.querySelectorAll("#ledgerPresetsBar .range-chip").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        document.getElementById("ledgerPeriodBadge").textContent = "Custom Dates";
+        renderLedgerDetail();
+      }
+
+      function openLedgerDetail(custId, customFrom = null, customTo = null) {
+        activeLedgerCustId = custId;
+        if (customFrom && customTo) {
+          document.getElementById("ledgerFromDate").value = customFrom;
+          document.getElementById("ledgerToDate").value = customTo;
+          document.getElementById("ledgerPeriodBadge").textContent = "Selected Period";
+          document.querySelectorAll("#ledgerPresetsBar .range-chip").forEach((b) => b.classList.remove("active"));
+        } else {
+          applyLedgerPreset("this_month");
+        }
+        document.getElementById("ledgerDetailView").classList.remove("hidden");
+        renderLedgerDetail();
+      }
+
+      function closeLedgerDetail() {
+        activeLedgerCustId = null;
+        document.getElementById("ledgerDetailView").classList.add("hidden");
+        renderDeliveryView();
+        renderCustomersListView();
+        if (currentTab === "analytics") renderAnalyticsView();
+      }
+
+      function renderLedgerDetail() {
+        const cust = state.customers.find((c) => c.id === activeLedgerCustId);
+        if (!cust) return;
+
+        const fromISO = document.getElementById("ledgerFromDate").value || getTodayISO();
+        const toISO = document.getElementById("ledgerToDate").value || fromISO;
+        const stats = calculateCustomerRangeSummary(cust, fromISO, toISO);
+
+        document.getElementById("ledgerHeaderName").textContent = cust.name;
+        document.getElementById("ledgerHeaderMeta").textContent = `${getScheduleLabel(cust.schedule)} • ₹${stats.rate}/L`;
+
+        const closingEl = document.getElementById("ledgerClosingBalance");
+        if (stats.closingBalanceAtEnd > 0) {
+          closingEl.textContent = `₹${stats.closingBalanceAtEnd.toLocaleString("en-IN")}`;
+          closingEl.style.color = "var(--rose)";
+        } else if (stats.closingBalanceAtEnd < 0) {
+          closingEl.textContent = `₹${Math.abs(stats.closingBalanceAtEnd).toLocaleString("en-IN")} Adv`;
+          closingEl.style.color = "var(--emerald)";
+        } else {
+          closingEl.textContent = "₹0";
+          closingEl.style.color = "var(--emerald)";
+        }
+
+        const overallEl = document.getElementById("ledgerOverallNetDue");
+        overallEl.textContent =
+          stats.overallNetDue > 0
+            ? `₹${stats.overallNetDue.toLocaleString("en-IN")}`
+            : stats.overallNetDue < 0
+            ? `₹${Math.abs(stats.overallNetDue).toLocaleString("en-IN")} Adv`
+            : "₹0";
+        overallEl.style.color = stats.overallNetDue > 0 ? "var(--rose)" : "var(--emerald)";
+
+        document.getElementById("ledgerPeriodLitres").textContent = `${stats.rangeLitres} L`;
+        document.getElementById("ledgerPeriodBill").textContent = `₹${stats.rangeBill.toLocaleString("en-IN")}`;
+        document.getElementById("ledgerPeriodPaid").textContent = `₹${stats.rangePaid.toLocaleString("en-IN")}`;
+
+        const openLbl =
+          stats.openingBalanceBeforeRange < 0
+            ? `Advance before ${formatDateShort(stats.start)}`
+            : `Opening Balance (before ${formatDateShort(stats.start)})`;
+        const openVal =
+          stats.openingBalanceBeforeRange < 0
+            ? `- ₹${Math.abs(stats.openingBalanceBeforeRange).toLocaleString("en-IN")}`
+            : `₹${stats.openingBalanceBeforeRange.toLocaleString("en-IN")}`;
+
+        document.getElementById("ledgerAccountClarityBox").innerHTML = `
+          <div class="clarity-row">
+            <span>${openLbl}</span>
+            <span>${openVal}</span>
+          </div>
+          <div class="clarity-row">
+            <span>+ Milk Bill (${stats.rangeLitres} L × ₹${stats.rate})</span>
+            <span>₹${stats.rangeBill.toLocaleString("en-IN")}</span>
+          </div>
+          <div class="clarity-row" style="color:var(--emerald);">
+            <span>- Paid in Selected Dates</span>
+            <span>- ₹${stats.rangePaid.toLocaleString("en-IN")}</span>
+          </div>
+          <div class="clarity-row total">
+            <span>Closing Balance (as of ${formatDateShort(stats.end)})</span>
+            <span style="color:${stats.closingBalanceAtEnd > 0 ? "var(--rose)" : "var(--emerald)"};">
+              ${stats.closingBalanceAtEnd < 0 ? "₹" + Math.abs(stats.closingBalanceAtEnd).toLocaleString("en-IN") + " Adv" : "₹" + stats.closingBalanceAtEnd.toLocaleString("en-IN")}
+            </span>
+          </div>
+        `;
+
+        // Enumerate dates in selected From -> To range
+        const dateList = enumerateDatesInclusive(stats.start, stats.end);
+        let rowsHtml = "";
+
+        dateList.forEach((dateKey) => {
+          const rec = state.entries[dateKey]?.[cust.id];
+          const mVal = rec && rec.morning !== undefined && rec.morning !== null ? parseFloat(rec.morning) : null;
+          const eVal = rec && rec.evening !== undefined && rec.evening !== null ? parseFloat(rec.evening) : null;
+          const dayTotal = (mVal || 0) + (eVal || 0);
+          const dayAmt = Math.round(dayTotal * stats.rate);
+
+          rowsHtml += `
+            <tr data-action="edit-day-row" data-date="${dateKey}" style="cursor:pointer;">
+              <td>${formatDayMonthOnly(dateKey)}</td>
+              <td class="num-right">${mVal !== null ? mVal + " L" : "—"}</td>
+              <td class="num-right">${eVal !== null ? eVal + " L" : "—"}</td>
+              <td class="num-right" style="color:var(--primary); font-weight:800;">${dayTotal > 0 ? dayTotal + " L" : "0 L"}</td>
+              <td class="num-right">₹${dayAmt}</td>
+            </tr>
+          `;
+        });
+
+        document.getElementById("ledgerDatesTableBody").innerHTML =
+          rowsHtml || `<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-faint);">No dates in selected range</td></tr>`;
+
+        // Render Payment History
+        const custPays = state.payments
+          .filter((p) => p.custId === cust.id)
+          .sort((a, b) => b.date.localeCompare(a.date));
+
+        let payHtml = "";
+        custPays.forEach((p) => {
+          const inRange = p.date >= stats.start && p.date <= stats.end;
+          payHtml += `
+            <div style="padding:11px 14px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <div>
+                <div style="font-size:14px; font-weight:800; color:var(--emerald);">
+                  + ₹${parseFloat(p.amount).toLocaleString("en-IN")}
+                  ${inRange ? `<span style="font-size:10px; background:var(--emerald-soft); padding:2px 6px; border-radius:999px; margin-left:4px;">In Period</span>` : ""}
+                </div>
+                <div style="font-size:11.5px; color:var(--text-faint);">
+                  ${formatDateShort(p.date)} • ${escapeHTML(p.mode || "Cash")}${p.note ? " • " + escapeHTML(p.note) : ""}
+                </div>
+              </div>
+              <button type="button" data-action="delete-payment" data-payid="${p.id}" style="border:none; background:var(--rose-soft); color:var(--rose); font-size:11px; font-weight:800; padding:6px 10px; border-radius:9px; cursor:pointer;">
+                Delete
+              </button>
+            </div>
+          `;
+        });
+
+        document.getElementById("ledgerPaymentsList").innerHTML =
+          payHtml || `<div style="padding:18px; text-align:center; font-size:12.5px; color:var(--text-faint);">No payments recorded yet</div>`;
+      }
+
+      function openEditDayEntry(dateKey) {
+        const cust = state.customers.find((c) => c.id === activeLedgerCustId);
+        if (!cust) return;
+        activeEditDateKey = dateKey;
+
+        const rec = state.entries[dateKey]?.[cust.id] || {};
+        document.getElementById("editDayTitle").textContent = cust.name;
+        document.getElementById("editDaySubtitle").textContent = formatDateShort(dateKey);
+        document.getElementById("editDayMorningInput").value =
+          rec.morning !== undefined && rec.morning !== null ? rec.morning : "";
+        document.getElementById("editDayEveningInput").value =
+          rec.evening !== undefined && rec.evening !== null ? rec.evening : "";
+
+        openModal("editDayEntryModal");
+      }
+
+      async function saveEditedDayEntry() {
+        if (!activeLedgerCustId || !activeEditDateKey) return;
+        const mRaw = document.getElementById("editDayMorningInput").value;
+        const eRaw = document.getElementById("editDayEveningInput").value;
+
+        if (!state.entries[activeEditDateKey]) state.entries[activeEditDateKey] = {};
+        if (!state.entries[activeEditDateKey][activeLedgerCustId]) {
+          state.entries[activeEditDateKey][activeLedgerCustId] = {};
+        }
+
+        if (mRaw === "") {
+          delete state.entries[activeEditDateKey][activeLedgerCustId].morning;
+        } else {
+          state.entries[activeEditDateKey][activeLedgerCustId].morning = parseFloat(mRaw);
+        }
+
+        if (eRaw === "") {
+          delete state.entries[activeEditDateKey][activeLedgerCustId].evening;
+        } else {
+          state.entries[activeEditDateKey][activeLedgerCustId].evening = parseFloat(eRaw);
+        }
+
+        if (Object.keys(state.entries[activeEditDateKey][activeLedgerCustId]).length === 0) {
+          delete state.entries[activeEditDateKey][activeLedgerCustId];
+        }
+
+        await savePersistentData();
+        closeModal("editDayEntryModal");
+        renderLedgerDetail();
+        showToast("✓ Day entry updated");
+      }
+
+      async function savePaymentForm(e) {
+        e.preventDefault();
+        if (!activeLedgerCustId) return;
+
+        const amount = parseFloat(document.getElementById("payAmountInput").value);
+        const mode = document.getElementById("payModeInput").value;
+        const date = document.getElementById("payDateInput").value;
+        const note = document.getElementById("payNoteInput").value.trim();
+
+        if (!amount || amount <= 0) return;
+
+        state.payments.push({
+          id: "pay_" + Date.now(),
+          custId: activeLedgerCustId,
+          amount,
+          mode,
+          date,
+          note
+        });
+
+        await savePersistentData();
+        closeModal("paymentModal");
+        renderLedgerDetail();
+        showToast(`💵 ₹${amount} payment recorded`);
+      }
+
+      function sendWhatsAppBillByRange(custId, fromISO, toISO) {
+        const cust = state.customers.find((c) => c.id === custId);
+        if (!cust) return;
+
+        const stats = calculateCustomerRangeSummary(cust, fromISO, toISO);
+        const periodTitle = formatRangeLabel(stats.start, stats.end);
+        const dateList = enumerateDatesInclusive(stats.start, stats.end);
+
+        let lines = [];
+        dateList.forEach((dateKey) => {
+          const rec = state.entries[dateKey]?.[cust.id];
+          if (rec) {
+            const m = parseFloat(rec.morning) || 0;
+            const e = parseFloat(rec.evening) || 0;
+            const tot = m + e;
+            if (tot > 0) {
+              lines.push(`${formatDayMonthOnly(dateKey)}: ${tot}L (M:${m}L, E:${e}L)`);
+            }
+          }
+        });
+
+        let msg = `🥛 *${state.dairyName.toUpperCase()}*\n`;
+        if (state.dairyPhone) msg += `📞 ${state.dairyPhone}\n`;
+        if (state.dairyUpi) msg += `💳 UPI: ${state.dairyUpi}\n`;
+        msg += `📋 *Milk Bill (${periodTitle})*\n`;
+        msg += `----------------------------\n`;
+        msg += `Customer: *${cust.name}*\n`;
+        msg += `Rate: ₹${stats.rate} / Litre\n`;
+        if (stats.openingBalanceBeforeRange !== 0) {
+          msg += `Opening Balance: *₹${stats.openingBalanceBeforeRange}*\n`;
+        }
+        msg += `Milk Delivered: *${stats.rangeLitres} L*\n`;
+        msg += `Period Bill: *₹${stats.rangeBill}*\n`;
+        msg += `Paid in Period: *₹${stats.rangePaid}*\n`;
+        msg += `----------------------------\n`;
+        if (lines.length > 0) {
+          msg += `📅 *Date-wise Milk Log:*\n${lines.join("\n")}\n`;
+          msg += `----------------------------\n`;
+        }
+        msg += `💰 *CLOSING BALANCE DUE: ₹${stats.closingBalanceAtEnd}*\n`;
+        msg += `Thank you!`;
+
+        const phoneDigits = (cust.phone || "").replace(/\D/g, "");
+        if (phoneDigits.length >= 10) {
+          const fullPhone = phoneDigits.length === 10 ? "91" + phoneDigits : phoneDigits;
+          window.open(`https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`, "_blank");
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = msg;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          showToast("📋 Bill copied! Opening WhatsApp...");
+          window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+        }
+      }
+
+      // =========================================================================
+      // 9. ANALYTICS DASHBOARD ENGINE (SUPPORTS 1 DAY, 1 WEEK, MONTH, CUSTOM DATES)
+      // =========================================================================
+      function applyAnalyticsPreset(preset) {
+        const range = computePresetRange(preset);
+        document.getElementById("analyticsFromDate").value = range.from;
+        document.getElementById("analyticsToDate").value = range.to;
+        document.getElementById("analyticsRangeBadge").textContent = range.label;
+
+        document.querySelectorAll("#analyticsPresetsBar .range-chip-hero").forEach((btn) => {
+          btn.classList.toggle("active", btn.getAttribute("data-preset") === preset);
+        });
+
+        renderAnalyticsView();
+      }
+
+      function onAnalyticsCustomDateChanged() {
+        document.querySelectorAll("#analyticsPresetsBar .range-chip-hero").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        document.getElementById("analyticsRangeBadge").textContent = "Custom Dates";
+        renderAnalyticsView();
+      }
+
+      function computeRangeBusinessAnalytics(fromISO, toISO) {
+        const start = fromISO <= toISO ? fromISO : toISO;
+        const end = fromISO <= toISO ? toISO : fromISO;
+        const dateList = enumerateDatesInclusive(start, end);
+
+        let totalLitres = 0;
+        let morningLitres = 0;
+        let eveningLitres = 0;
+        let totalBilled = 0;
+        let totalCollected = 0;
+        let overallPendingAllCustomers = 0;
+        let dueCustomersCount = 0;
+
+        const dailySeries = [];
+        let peakDay = { label: null, litres: 0 };
+        let activeDaysCount = 0;
+
+        dateList.forEach((dateKey) => {
+          const dayObj = state.entries[dateKey] || {};
+          let dayL = 0;
+
+          for (const custId in dayObj) {
+            const rec = dayObj[custId];
+            if (rec) {
+              const m = parseFloat(rec.morning) || 0;
+              const e = parseFloat(rec.evening) || 0;
+              morningLitres += m;
+              eveningLitres += e;
+              dayL += m + e;
+            }
+          }
+
+          dayL = parseFloat(dayL.toFixed(2));
+          totalLitres += dayL;
+          if (dayL > 0) activeDaysCount++;
+          if (dayL > peakDay.litres) {
+            peakDay = { label: formatDayMonthOnly(dateKey), litres: dayL };
+          }
+          dailySeries.push({ dateKey, shortLabel: formatDayMonthOnly(dateKey), litres: dayL });
+        });
+
+        const customerBreakdown = state.customers.map((c) => {
+          const sum = calculateCustomerRangeSummary(c, start, end);
+          totalBilled += sum.rangeBill;
+          totalCollected += sum.rangePaid;
+          if (sum.overallNetDue > 0) {
+            overallPendingAllCustomers += sum.overallNetDue;
+            dueCustomersCount++;
+          }
+          return {
+            customer: c,
+            ...sum
+          };
+        });
+
+        const rangePaymentsList = state.payments
+          .filter((p) => p.date >= start && p.date <= end)
+          .sort((a, b) => a.date.localeCompare(b.date));
+
+        const activeCustomersCount = customerBreakdown.filter((item) => item.rangeLitres > 0).length;
+        const totalSpanDays = Math.max(1, dateList.length);
+        const avgDailyLitres = parseFloat((totalLitres / totalSpanDays).toFixed(2));
+        const collectionRate = totalBilled > 0 ? Math.min(100, Math.round((totalCollected / totalBilled) * 100)) : 0;
+
+        return {
+          start,
+          end,
+          totalSpanDays,
+          totalLitres: parseFloat(totalLitres.toFixed(2)),
+          morningLitres: parseFloat(morningLitres.toFixed(2)),
+          eveningLitres: parseFloat(eveningLitres.toFixed(2)),
+          totalBilled: Math.round(totalBilled),
+          totalCollected: Math.round(totalCollected),
+          overallPendingAllCustomers: Math.round(overallPendingAllCustomers),
+          dueCustomersCount,
+          activeCustomersCount,
+          avgDailyLitres,
+          activeDaysCount,
+          peakDay,
+          collectionRate,
+          dailySeries,
+          customerBreakdown,
+          rangePaymentsList
+        };
+      }
+
+      function renderAnalyticsView() {
+        const fromISO = document.getElementById("analyticsFromDate").value || getTodayISO();
+        const toISO = document.getElementById("analyticsToDate").value || fromISO;
+        const data = computeRangeBusinessAnalytics(fromISO, toISO);
+
+        document.getElementById("kpiTotalLitres").textContent = `${data.totalLitres} L`;
+        document.getElementById("kpiAvgDaily").textContent = `Avg ${data.avgDailyLitres} L / day (${data.totalSpanDays}d)`;
+
+        document.getElementById("kpiTotalBilled").textContent = `₹${data.totalBilled.toLocaleString("en-IN")}`;
+        document.getElementById("kpiActiveCustomers").textContent = `${data.activeCustomersCount} active customers`;
+
+        document.getElementById("kpiTotalCollected").textContent = `₹${data.totalCollected.toLocaleString("en-IN")}`;
+        document.getElementById("kpiCollectionRate").textContent = `${data.collectionRate}% of period bill collected`;
+
+        document.getElementById("kpiTotalPending").textContent = `₹${data.overallPendingAllCustomers.toLocaleString("en-IN")}`;
+        document.getElementById("kpiDueCustCount").textContent = `${data.dueCustomersCount} customers with due`;
+
+        document.getElementById("shiftSplitTotalLabel").textContent = `${data.totalLitres} L Total`;
+        const mPct = data.totalLitres > 0 ? Math.round((data.morningLitres / data.totalLitres) * 100) : 50;
+        const ePct = data.totalLitres > 0 ? 100 - mPct : 50;
+
+        document.getElementById("splitBarMorning").style.width = `${mPct}%`;
+        document.getElementById("splitBarEvening").style.width = `${ePct}%`;
+        document.getElementById("splitMorningText").textContent =
+          `☀️ Morning: ${data.morningLitres} L (${data.totalLitres > 0 ? mPct : 0}%)`;
+        document.getElementById("splitEveningText").textContent =
+          `🌙 Evening: ${data.eveningLitres} L (${data.totalLitres > 0 ? ePct : 0}%)`;
+
+        document.getElementById("chartDateRangeSubtitle").textContent = formatRangeLabel(data.start, data.end);
+        renderDailyTrendSVG(data);
+
+        document.getElementById("chartPeakDayPill").textContent =
+          data.peakDay.litres > 0 ? `🏆 Peak: ${data.peakDay.label} (${data.peakDay.litres} L)` : "🏆 Peak Day: —";
+        document.getElementById("chartActiveDaysPill").textContent =
+          `📅 Active Days: ${data.activeDaysCount} / ${data.totalSpanDays}`;
+
+        // Render Customer-Wise Summary Table
+        const tbody = document.getElementById("analyticsCustomerTableBody");
+        if (data.customerBreakdown.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:18px; color:var(--text-faint);">No customers added yet.</td></tr>`;
+        } else {
+          tbody.innerHTML = data.customerBreakdown
+            .sort((a, b) => b.rangeLitres - a.rangeLitres)
+            .map((item) => {
+              const dueText =
+                item.overallNetDue > 0
+                  ? `₹${item.overallNetDue.toLocaleString("en-IN")}`
+                  : item.overallNetDue < 0
+                  ? `₹${Math.abs(item.overallNetDue).toLocaleString("en-IN")} Adv`
+                  : "₹0";
+
+              return `
+                <tr>
+                  <td style="cursor:pointer;" data-action="open-ledger-range" data-id="${item.customer.id}">
+                    <div style="font-weight:800;">${escapeHTML(item.customer.name)}</div>
+                    <div style="font-size:10px; color:var(--text-faint);">₹${item.rate}/L</div>
+                  </td>
+                  <td class="num-right" style="color:var(--primary);">${item.rangeLitres} L</td>
+                  <td class="num-right">₹${item.rangeBill.toLocaleString("en-IN")}</td>
+                  <td class="num-right" style="color:var(--emerald);">₹${item.rangePaid.toLocaleString("en-IN")}</td>
+                  <td class="num-right" style="color:${item.overallNetDue > 0 ? "var(--rose)" : "var(--emerald)"};">${dueText}</td>
+                  <td class="num-right">
+                    <button type="button" class="due-quick-btn bouncy-btn" data-action="quick-cust-pdf" data-id="${item.customer.id}">📄</button>
+                  </td>
+                </tr>
+              `;
+            })
+            .join("");
+        }
+      }
+
+      function renderDailyTrendSVG(data) {
+        const container = document.getElementById("dailyTrendSvgContainer");
+        // Show up to last 45 days in chart if "All Time" is very long
+        const series = data.dailySeries.length > 45 ? data.dailySeries.slice(-45) : data.dailySeries;
+        const maxVal = Math.max(...series.map((s) => s.litres), 1);
+
+        const width = 420;
+        const height = 148;
+        const padLeft = 30;
+        const padRight = 8;
+        const padTop = 16;
+        const padBottom = 24;
+        const chartW = width - padLeft - padRight;
+        const chartH = height - padTop - padBottom;
+        const barSlot = chartW / Math.max(1, series.length);
+        const barW = Math.max(4, Math.min(24, barSlot * 0.65));
+
+        const gridStroke = state.darkMode ? "#26334d" : "#e6dec8";
+        const labelFill = state.darkMode ? "#94a3b8" : "#78716c";
+        const emptyBarFill = state.darkMode ? "#26334d" : "#d4c8ae";
+
+        let gridLines = "";
+        [0, 0.5, 1].forEach((ratio) => {
+          const y = padTop + chartH - ratio * chartH;
+          const labelVal = Math.round(maxVal * ratio);
+          gridLines += `
+            <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="${gridStroke}" stroke-width="1" stroke-dasharray="${ratio === 0 ? "0" : "3,3"}" />
+            <text x="${padLeft - 4}" y="${y + 3}" text-anchor="end" font-size="8.5" fill="${labelFill}" font-weight="700">${labelVal}L</text>
+          `;
+        });
+
+        const labelStep = Math.max(1, Math.ceil(series.length / 6));
+        let bars = "";
+        series.forEach((pt, i) => {
+          const x = padLeft + i * barSlot + (barSlot - barW) / 2;
+          const h = pt.litres > 0 ? Math.max(3, (pt.litres / maxVal) * chartH) : 0;
+          const y = padTop + chartH - h;
+          const isPeak = pt.litres > 0 && pt.litres === data.peakDay.litres;
+          const fill = isPeak ? "#16a34a" : "#0ea5e9";
+
+          if (h > 0) {
+            bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${fill}"><title>${pt.shortLabel}: ${pt.litres} L</title></rect>`;
+          } else {
+            bars += `<rect x="${x.toFixed(1)}" y="${padTop + chartH - 1.5}" width="${barW.toFixed(1)}" height="1.5" rx="1" fill="${emptyBarFill}" />`;
+          }
+
+          if (i === 0 || i === series.length - 1 || i % labelStep === 0) {
+            bars += `<text x="${(x + barW / 2).toFixed(1)}" y="${height - 6}" text-anchor="middle" font-size="8" fill="${labelFill}" font-weight="700">${pt.shortLabel}</text>`;
+          }
+        });
+
+        container.innerHTML = `
+          <svg viewBox="0 0 ${width} ${height}" style="width:100%; height:auto; display:block;">
+            ${gridLines}
+            ${bars}
+          </svg>
+        `;
+      }
+
+      // =========================================================================
+      // 10. CUSTOM DATE-RANGE PDF INVOICE & BUSINESS REPORT GENERATOR
+      // =========================================================================
+      function showPdfReportModal(modalTitle, reportHtml, filenameBase) {
+        currentPdfFilename = filenameBase;
+        document.getElementById("pdfModalTitle").textContent = modalTitle;
+        document.getElementById("pdfPreviewPaperArea").innerHTML = reportHtml;
+        document.getElementById("printReportContainer").innerHTML = reportHtml;
+        openModal("pdfPreviewModal");
+      }
+
+      function openCustomerPDFByRange(custId, fromISO, toISO) {
+        const cust = state.customers.find((c) => c.id === custId);
+        if (!cust) return;
+
+        const stats = calculateCustomerRangeSummary(cust, fromISO, toISO);
+        const periodLabel = formatRangeLabel(stats.start, stats.end);
+        const dateList = enumerateDatesInclusive(stats.start, stats.end);
+
+        let dayRowsHtml = "";
+        dateList.forEach((dateKey) => {
+          const rec = state.entries[dateKey]?.[cust.id];
+          const mVal = rec && rec.morning !== undefined && rec.morning !== null ? parseFloat(rec.morning) : null;
+          const eVal = rec && rec.evening !== undefined && rec.evening !== null ? parseFloat(rec.evening) : null;
+          const dayTot = (mVal || 0) + (eVal || 0);
+          const dayAmt = Math.round(dayTot * stats.rate);
+
+          // If range is <= 31 days, show every date clearly; if longer, show dates that have entries
+          if (dateList.length <= 31 || rec !== undefined) {
+            dayRowsHtml += `
+              <tr>
+                <td>${formatDateShort(dateKey)}</td>
+                <td class="num-right">${mVal !== null ? mVal + " L" : "—"}</td>
+                <td class="num-right">${eVal !== null ? eVal + " L" : "—"}</td>
+                <td class="num-right" style="font-weight:700;">${dayTot} L</td>
+                <td class="num-right">₹${dayAmt.toLocaleString("en-IN")}</td>
+              </tr>
+            `;
+          }
+        });
+
+        if (!dayRowsHtml) {
+          dayRowsHtml = `<tr><td colspan="5" style="text-align:center; color:#64748b; padding:12px;">No milk deliveries recorded in this date range.</td></tr>`;
+        }
+
+        const rangePays = state.payments
+          .filter((p) => p.custId === cust.id && p.date >= stats.start && p.date <= stats.end)
+          .sort((a, b) => a.date.localeCompare(b.date));
+
+        let payRowsHtml = "";
+        if (rangePays.length > 0) {
+          payRowsHtml = `
+            <div class="pdf-section-title">Payments Received (${periodLabel})</div>
+            <table class="pdf-table">
+              <thead>
+                <tr>
+                  <th>Payment Date</th>
+                  <th>Payment Mode</th>
+                  <th>Note</th>
+                  <th class="num-right">Amount Paid (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rangePays
+                  .map(
+                    (p) => `
+                  <tr>
+                    <td>${formatDateShort(p.date)}</td>
+                    <td>${escapeHTML(p.mode || "Cash")}</td>
+                    <td>${escapeHTML(p.note || "—")}</td>
+                    <td class="num-right" style="font-weight:700; color:#15803d;">₹${parseFloat(p.amount).toLocaleString("en-IN")}</td>
+                  </tr>
+                `
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+          `;
+        }
+
+        const openBalText =
+          stats.openingBalanceBeforeRange < 0
+            ? `- ₹${Math.abs(stats.openingBalanceBeforeRange).toLocaleString("en-IN")} (Advance)`
+            : `₹${stats.openingBalanceBeforeRange.toLocaleString("en-IN")}`;
+
+        const closingPayableText =
+          stats.closingBalanceAtEnd < 0
+            ? `₹${Math.abs(stats.closingBalanceAtEnd).toLocaleString("en-IN")} Advance`
+            : `₹${stats.closingBalanceAtEnd.toLocaleString("en-IN")}`;
+
+        const contactLine = [
+          state.dairyPhone ? `Phone: ${escapeHTML(state.dairyPhone)}` : "",
+          state.dairyUpi ? `UPI: ${escapeHTML(state.dairyUpi)}` : ""
+        ]
+          .filter(Boolean)
+          .join(" • ");
+
+        const reportHtml = `
+          <div class="pdf-sheet">
+            <div class="pdf-header">
+              <div>
+                <div class="pdf-brand-name">🥛 ${escapeHTML(state.dairyName)}</div>
+                <div class="pdf-brand-sub">${contactLine || "Fresh Daily Dairy Supply"}</div>
+              </div>
+              <div class="pdf-doc-badge">
+                <div class="pdf-doc-title">Milk Bill / Statement</div>
+                <div class="pdf-doc-meta">Period: <strong>${periodLabel}</strong></div>
+                <div class="pdf-doc-meta">Generated: ${formatDateShort(getTodayISO())}</div>
+              </div>
+            </div>
+
+            <div class="pdf-info-grid">
+              <div class="pdf-box">
+                <div class="pdf-box-title">Billed To (Customer)</div>
+                <div style="font-size:13px; font-weight:800;">${escapeHTML(cust.name)}</div>
+                <div style="font-size:10.5px; color:#475569; margin-top:2px;">
+                  ${cust.phone ? "Phone: " + escapeHTML(cust.phone) + " • " : ""}${getSchedulePlainText(cust.schedule)}
+                </div>
+              </div>
+              <div class="pdf-box">
+                <div class="pdf-box-title">Period Summary</div>
+                <div style="font-size:11.5px; font-weight:700;">Rate: ₹${stats.rate} / Litre</div>
+                <div style="font-size:10.5px; color:#475569; margin-top:2px;">
+                  Delivery Days: ${stats.activeDeliveryDays} • Total Milk: <strong>${stats.rangeLitres} L</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="pdf-section-title">Date-Wise Milk Delivery Log (${periodLabel})</div>
+            <table class="pdf-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th class="num-right">Morning</th>
+                  <th class="num-right">Evening</th>
+                  <th class="num-right">Total</th>
+                  <th class="num-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${dayRowsHtml}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td>TOTAL</td>
+                  <td class="num-right">${stats.rangeMorningLitres} L</td>
+                  <td class="num-right">${stats.rangeEveningLitres} L</td>
+                  <td class="num-right">${stats.rangeLitres} L</td>
+                  <td class="num-right">₹${stats.rangeBill.toLocaleString("en-IN")}</td>
+                </tr>
+              </tfoot>
+            </table>
+
+            ${payRowsHtml}
+
+            <div class="pdf-summary-box">
+              <div class="pdf-sum-row">
+                <span>Opening Balance (before ${formatDateShort(stats.start)})</span>
+                <strong>${openBalText}</strong>
+              </div>
+              <div class="pdf-sum-row">
+                <span>Current Period Milk Bill (${stats.rangeLitres} L × ₹${stats.rate})</span>
+                <strong>+ ₹${stats.rangeBill.toLocaleString("en-IN")}</strong>
+              </div>
+              <div class="pdf-sum-row" style="color:#15803d;">
+                <span>Payments Received in Period</span>
+                <strong>- ₹${stats.rangePaid.toLocaleString("en-IN")}</strong>
+              </div>
+              <div class="pdf-sum-row final">
+                <span>CLOSING BALANCE PAYABLE</span>
+                <span>${closingPayableText}</span>
+              </div>
+            </div>
+
+            <div class="pdf-footer">
+              <span>Thank you for choosing ${escapeHTML(state.dairyName)}!</span>
+              <span>Generated via MilkBook</span>
+            </div>
+          </div>
+        `;
+
+        const safeCust = cust.name.replace(/[^a-zA-Z0-9_-]/g, "_");
+        showPdfReportModal(`📄 ${cust.name} — Bill`, reportHtml, `MilkBook_Bill_${safeCust}_${stats.start}_to_${stats.end}`);
+      }
+
+      function openBusinessRangePDFReport() {
+        const fromISO = document.getElementById("analyticsFromDate").value || getTodayISO();
+        const toISO = document.getElementById("analyticsToDate").value || fromISO;
+        const data = computeRangeBusinessAnalytics(fromISO, toISO);
+        const periodLabel = formatRangeLabel(data.start, data.end);
+
+        const custRowsHtml = data.customerBreakdown
+          .map((item, idx) => {
+            const dueText =
+              item.overallNetDue > 0
+                ? `₹${item.overallNetDue.toLocaleString("en-IN")}`
+                : item.overallNetDue < 0
+                ? `₹${Math.abs(item.overallNetDue).toLocaleString("en-IN")} Adv`
+                : "₹0";
+
+            return `
+              <tr>
+                <td>${idx + 1}</td>
+                <td style="font-weight:700;">${escapeHTML(item.customer.name)}</td>
+                <td class="num-right">₹${item.rate}</td>
+                <td class="num-right">${item.rangeLitres} L</td>
+                <td class="num-right">₹${item.rangeBill.toLocaleString("en-IN")}</td>
+                <td class="num-right" style="color:#15803d;">₹${item.rangePaid.toLocaleString("en-IN")}</td>
+                <td class="num-right" style="font-weight:700; color:${item.overallNetDue > 0 ? "#be123c" : "#15803d"};">${dueText}</td>
+              </tr>
+            `;
+          })
+          .join("");
+
+        const payLogHtml =
+          data.rangePaymentsList.length === 0
+            ? `<p style="font-size:11px; color:#64748b; margin-top:6px;">No payments recorded in ${periodLabel}.</p>`
+            : `
+              <div class="pdf-section-title">Payment Collection Log (${periodLabel})</div>
+              <table class="pdf-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Customer Name</th>
+                    <th>Mode</th>
+                    <th class="num-right">Amount (₹)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${data.rangePaymentsList
+                    .map((p) => {
+                      const c = state.customers.find((x) => x.id === p.custId);
+                      return `
+                        <tr>
+                          <td>${formatDateShort(p.date)}</td>
+                          <td style="font-weight:700;">${c ? escapeHTML(c.name) : "Unknown"}</td>
+                          <td>${escapeHTML(p.mode || "Cash")}</td>
+                          <td class="num-right" style="font-weight:700; color:#15803d;">₹${parseFloat(p.amount).toLocaleString("en-IN")}</td>
+                        </tr>
+                      `;
+                    })
+                    .join("")}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="3">TOTAL COLLECTED</td>
+                    <td class="num-right">₹${data.totalCollected.toLocaleString("en-IN")}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            `;
+
+        const reportHtml = `
+          <div class="pdf-sheet">
+            <div class="pdf-header">
+              <div>
+                <div class="pdf-brand-name">🥛 ${escapeHTML(state.dairyName)}</div>
+                <div class="pdf-brand-sub">Dairy Business & Ledger Summary Report</div>
+              </div>
+              <div class="pdf-doc-badge">
+                <div class="pdf-doc-title">Business Report</div>
+                <div class="pdf-doc-meta">Period: <strong>${periodLabel}</strong></div>
+                <div class="pdf-doc-meta">Printed: ${formatDateShort(getTodayISO())}</div>
+              </div>
+            </div>
+
+            <div class="pdf-kpi-row">
+              <div class="pdf-kpi">
+                <div class="pdf-kpi-lbl">Total Milk</div>
+                <div class="pdf-kpi-val" style="color:#0369a1;">${data.totalLitres} L</div>
+                <div style="font-size:9.5px; color:#64748b;">M: ${data.morningLitres}L | E: ${data.eveningLitres}L</div>
+              </div>
+              <div class="pdf-kpi">
+                <div class="pdf-kpi-lbl">Period Billed</div>
+                <div class="pdf-kpi-val">₹${data.totalBilled.toLocaleString("en-IN")}</div>
+                <div style="font-size:9.5px; color:#64748b;">${data.activeCustomersCount} active customers</div>
+              </div>
+              <div class="pdf-kpi">
+                <div class="pdf-kpi-lbl">Collected</div>
+                <div class="pdf-kpi-val" style="color:#15803d;">₹${data.totalCollected.toLocaleString("en-IN")}</div>
+                <div style="font-size:9.5px; color:#64748b;">${data.collectionRate}% rate</div>
+              </div>
+              <div class="pdf-kpi">
+                <div class="pdf-kpi-lbl">Overall Dues</div>
+                <div class="pdf-kpi-val" style="color:#be123c;">₹${data.overallPendingAllCustomers.toLocaleString("en-IN")}</div>
+                <div style="font-size:9.5px; color:#64748b;">${data.dueCustomersCount} pending</div>
+              </div>
+            </div>
+
+            <div class="pdf-section-title">Customer-Wise Summary (${periodLabel})</div>
+            <table class="pdf-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Customer</th>
+                  <th class="num-right">Rate</th>
+                  <th class="num-right">Milk</th>
+                  <th class="num-right">Bill</th>
+                  <th class="num-right">Paid</th>
+                  <th class="num-right">Overall Due</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${custRowsHtml || `<tr><td colspan="7" style="text-align:center; padding:12px;">No customers found.</td></tr>`}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3">GRAND TOTAL</td>
+                  <td class="num-right">${data.totalLitres} L</td>
+                  <td class="num-right">₹${data.totalBilled.toLocaleString("en-IN")}</td>
+                  <td class="num-right">₹${data.totalCollected.toLocaleString("en-IN")}</td>
+                  <td class="num-right">₹${data.overallPendingAllCustomers.toLocaleString("en-IN")}</td>
+                </tr>
+              </tfoot>
+            </table>
+
+            ${payLogHtml}
+
+            <div class="pdf-footer">
+              <span>${escapeHTML(state.dairyName)} — Business Audit Report</span>
+              <span>Generated via MilkBook</span>
+            </div>
+          </div>
+        `;
+
+        showPdfReportModal(`📊 Business Report (${periodLabel})`, reportHtml, `MilkBook_Business_${data.start}_to_${data.end}`);
+      }
+
+      function triggerBrowserPrint() {
+        const origTitle = document.title;
+        document.title = currentPdfFilename;
+        window.print();
+        setTimeout(() => {
+          document.title = origTitle;
+        }, 1200);
+      }
+
+      function downloadStandaloneReportFile() {
+        const innerReport = document.getElementById("printReportContainer").innerHTML;
+        const fullDoc = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>${escapeHTML(currentPdfFilename)}</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; color: #0f172a; }
+  .pdf-header { display: flex; justify-content: space-between; border-bottom: 2.5px solid #0284c7; padding-bottom: 10px; margin-bottom: 16px; }
+  .pdf-brand-name { font-size: 20px; font-weight: 800; color: #0369a1; }
+  .pdf-brand-sub, .pdf-doc-meta { font-size: 12px; color: #475569; }
+  .pdf-doc-badge { text-align: right; }
+  .pdf-doc-title { font-size: 14px; font-weight: 800; text-transform: uppercase; }
+  .pdf-info-grid, .pdf-kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .pdf-box, .pdf-kpi { border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; background: #f8fafc; }
+  .pdf-box-title, .pdf-kpi-lbl { font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: 700; }
+  .pdf-kpi-val { font-size: 16px; font-weight: 800; margin-top: 3px; }
+  .pdf-section-title { font-size: 13px; font-weight: 800; margin: 14px 0 6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+  .pdf-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 14px; }
+  .pdf-table th { background: #f1f5f9; text-align: left; padding: 7px 8px; border: 1px solid #cbd5e1; }
+  .pdf-table td { padding: 6px 8px; border: 1px solid #cbd5e1; }
+  .pdf-table tfoot td { background: #e0f2fe; font-weight: 800; }
+  .num-right { text-align: right; }
+  .pdf-summary-box { border: 1.5px solid #0284c7; border-radius: 8px; overflow: hidden; margin-top: 10px; }
+  .pdf-sum-row { display: flex; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-size: 12.5px; }
+  .pdf-sum-row.final { background: #0284c7; color: #ffffff; font-weight: 800; font-size: 14px; border-bottom: none; }
+  .pdf-footer { margin-top: 18px; padding-top: 10px; border-top: 1px dashed #cbd5e1; display: flex; justify-content: space-between; font-size: 11px; color: #64748b; }
+  @media print { .no-print { display: none; } }
+</style>
+</head>
+<body>
+  <div class="no-print" style="margin-bottom:14px; text-align:right;">
+    <button onclick="window.print()" style="background:#0284c7; color:#fff; border:none; padding:9px 16px; border-radius:8px; font-weight:700; cursor:pointer;">🖨️ Print / Save as PDF</button>
+  </div>
+  ${innerReport}
+</body>
+</html>`;
+
+        const blob = new Blob([fullDoc], { type: "text/html;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${currentPdfFilename}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast("⬇️ Report file downloaded!");
+      }
+
+      // =========================================================================
+      // 11. BACKUP, RESTORE, CUSTOM RANGE CSV & 14-DAY DEMO DATA
+      // =========================================================================
+      async function saveGlobalSettings() {
+        state.dairyName = document.getElementById("settingDairyName").value.trim() || "Fresh Cow Dairy";
+        state.dairyPhone = document.getElementById("settingDairyPhone").value.trim();
+        state.dairyUpi = document.getElementById("settingDairyUpi").value.trim();
+        state.defaultRate = parseFloat(document.getElementById("settingDefaultRate").value) || 60;
+        await savePersistentData();
+        showToast("✓ Dairy settings saved!");
+      }
+
+      function downloadBackupJSON() {
+        const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `MilkBook_Backup_${getTodayISO()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast("✓ Backup (.json) downloaded");
+      }
+
+      function restoreBackupJSON(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          try {
+            const parsed = JSON.parse(e.target.result);
+            if (parsed && Array.isArray(parsed.customers)) {
+              state = {
+                dairyName: parsed.dairyName || "Fresh Cow Dairy",
+                dairyPhone: parsed.dairyPhone || parsed.dairyContact || "",
+                dairyUpi: parsed.dairyUpi || "",
+                defaultRate: parseFloat(parsed.defaultRate) || 60,
+                darkMode: Boolean(parsed.darkMode),
+                updatedAt: Date.now(),
+                customers: parsed.customers,
+                entries: parsed.entries || {},
+                payments: Array.isArray(parsed.payments) ? parsed.payments : []
+              };
+              applyThemeClass();
+              await savePersistentData();
+              renderDeliveryView();
+              renderCustomersListView();
+              renderAnalyticsView();
+              showToast("✓ Backup restored successfully!");
+            } else {
+              showToast("Invalid backup file");
+            }
+          } catch (err) {
+            showToast("Could not read JSON file");
+          }
+          event.target.value = "";
+        };
+        reader.readAsText(file);
+      }
+
+      function exportCustomRangeCSV() {
+        const fromISO = document.getElementById("exportCsvFromDate").value || getTodayISO();
+        const toISO = document.getElementById("exportCsvToDate").value || fromISO;
+        const start = fromISO <= toISO ? fromISO : toISO;
+        const end = fromISO <= toISO ? toISO : fromISO;
+
+        let csv = "Date,Customer Name,Schedule,Phone,Morning (L),Evening (L),Total (L),Rate (INR),Amount (INR)\n";
+
+        const dates = Object.keys(state.entries)
+          .filter((d) => d >= start && d <= end)
+          .sort();
+
+        dates.forEach((dateKey) => {
+          const dayObj = state.entries[dateKey];
+          for (const custId in dayObj) {
+            const c = state.customers.find((item) => item.id === custId);
+            if (c) {
+              const m = parseFloat(dayObj[custId].morning) || 0;
+              const e = parseFloat(dayObj[custId].evening) || 0;
+              const tot = m + e;
+              const rate = parseFloat(c.rate) || state.defaultRate;
+              const amt = Math.round(tot * rate);
+              csv += `${dateKey},"${c.name.replace(/"/g, '""')}",${c.schedule},"${c.phone || ""}",${m},${e},${tot},${rate},${amt}\n`;
+            }
+          }
+        });
+
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `MilkBook_Report_${start}_to_${end}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast(`📊 Exported CSV (${start} to ${end})`);
+      }
+
+      function seedRealistic14DayDemoData(notify = true) {
+        const today = getTodayISO();
+
+        state.customers = [
+          {
+            id: "cust_demo_1",
+            name: "Rajesh Verma",
+            schedule: "morning",
+            defaultQty: 1.5,
+            rate: 60,
+            phone: "9876543210",
+            openingDue: 250
+          },
+          {
+            id: "cust_demo_2",
+            name: "Sunita Devi",
+            schedule: "evening",
+            defaultQty: 1,
+            rate: 60,
+            phone: "",
+            openingDue: 0
+          },
+          {
+            id: "cust_demo_3",
+            name: "Amit Patel",
+            schedule: "both",
+            defaultQty: 1,
+            rate: 62,
+            phone: "9123456789",
+            openingDue: 0
+          },
+          {
+            id: "cust_demo_4",
+            name: "Pooja Singh",
+            schedule: "morning",
+            defaultQty: 2,
+            rate: 60,
+            phone: "",
+            openingDue: 120
+          }
+        ];
+
+        state.entries = {};
+        for (let offset = 1; offset <= 13; offset++) {
+          const iso = addDaysISO(today, -offset);
+          state.entries[iso] = {
+            cust_demo_1: { morning: offset % 6 === 0 ? 2 : 1.5 },
+            cust_demo_2: { evening: offset % 5 === 0 ? 0 : 1 },
+            cust_demo_3: { morning: 1, evening: 1 },
+            cust_demo_4: { morning: 2 }
+          };
+        }
+
+        state.payments = [
+          {
+            id: "pay_demo_1",
+            custId: "cust_demo_1",
+            amount: 600,
+            mode: "UPI / GPay",
+            date: addDaysISO(today, -5),
+            note: "Weekly payment"
+          },
+          {
+            id: "pay_demo_2",
+            custId: "cust_demo_3",
+            amount: 1000,
+            mode: "Cash",
+            date: addDaysISO(today, -2),
+            note: "Part payment"
+          }
+        ];
+
+        if (notify) {
+          savePersistentData();
+          renderDeliveryView();
+          renderCustomersListView();
+          renderAnalyticsView();
+          showToast("✨ 14-day demo data loaded!");
+        }
+      }
+
+      // =========================================================================
+      // 12. SINGLE GLOBAL EVENT DELEGATION (100% RELIABLE IN ALL BROWSERS)
+      // =========================================================================
+      document.addEventListener("click", (e) => {
+        const el = e.target.closest("[data-action]");
+        if (!el) return;
+
+        const action = el.getAttribute("data-action");
+
+        switch (action) {
+          case "goto-settings":
+            switchTab("settings");
+            break;
+          case "toggle-theme":
+            toggleDarkMode();
+            break;
+          case "switch-tab":
+            switchTab(el.getAttribute("data-tab"));
+            break;
+
+          // Delivery view actions
+          case "prev-date":
+            changeDeliveryDate(-1);
+            break;
+          case "next-date":
+            changeDeliveryDate(1);
+            break;
+          case "today-date":
+            document.getElementById("deliveryDateInput").value = getTodayISO();
+            renderDeliveryView();
+            showToast("📅 Jumped to Today");
+            break;
+          case "set-shift":
+            setDeliveryShift(el.getAttribute("data-shift"));
+            break;
+          case "set-delivery-filter":
+            setDeliveryFilter(el.getAttribute("data-filter"));
+            break;
+          case "deliver-all-pending":
+            markAllPendingDelivered();
+            break;
+          case "deliver-milk":
+            logMilkDelivery(el.getAttribute("data-id"), parseFloat(el.getAttribute("data-qty")));
+            break;
+          case "open-qty-picker":
+            openQtyPicker(el.getAttribute("data-id"));
+            break;
+          case "skip-milk":
+            logMilkDelivery(el.getAttribute("data-id"), 0);
+            break;
+          case "undo-milk":
+            clearMilkEntry(el.getAttribute("data-id"));
+            break;
+
+          // Quantity picker modal
+          case "pick-preset-qty":
+            applyPickedQty(parseFloat(el.getAttribute("data-qty")));
+            break;
+          case "save-custom-qty":
+            applyCustomQtyInput();
+            break;
+
+          // Customers & Ledger actions
+          case "open-add-customer":
+            openCustomerModal();
+            break;
+          case "set-cust-list-filter":
+            setCustListFilter(el.getAttribute("data-filter"));
+            break;
+          case "select-schedule":
+            selectScheduleOption(el.getAttribute("data-sched"));
+            break;
+          case "open-ledger":
+            openLedgerDetail(el.getAttribute("data-id"));
+            break;
+          case "open-ledger-range": {
+            const f = document.getElementById("analyticsFromDate").value;
+            const t = document.getElementById("analyticsToDate").value;
+            openLedgerDetail(el.getAttribute("data-id"), f, t);
+            break;
+          }
+          case "close-ledger":
+            closeLedgerDetail();
+            break;
+          case "edit-current-customer": {
+            const cust = state.customers.find((c) => c.id === activeLedgerCustId);
+            if (cust) openCustomerModal(cust);
+            break;
+          }
+          case "ledger-preset":
+            applyLedgerPreset(el.getAttribute("data-preset"));
+            break;
+          case "open-payment-modal":
+            document.getElementById("payAmountInput").value = "";
+            document.getElementById("payModeInput").value = "Cash";
+            document.getElementById("payDateInput").value = getTodayISO();
+            document.getElementById("payNoteInput").value = "";
+            openModal("paymentModal");
+            break;
+          case "send-whatsapp-bill": {
+            if (!activeLedgerCustId) break;
+            const f = document.getElementById("ledgerFromDate").value || getTodayISO();
+            const t = document.getElementById("ledgerToDate").value || f;
+            sendWhatsAppBillByRange(activeLedgerCustId, f, t);
+            break;
+          }
+          case "open-customer-pdf": {
+            if (!activeLedgerCustId) break;
+            const f = document.getElementById("ledgerFromDate").value || getTodayISO();
+            const t = document.getElementById("ledgerToDate").value || f;
+            openCustomerPDFByRange(activeLedgerCustId, f, t);
+            break;
+          }
+          case "quick-cust-pdf": {
+            const cid = el.getAttribute("data-id");
+            const f = document.getElementById("analyticsFromDate").value || getTodayISO();
+            const t = document.getElementById("analyticsToDate").value || f;
+            openCustomerPDFByRange(cid, f, t);
+            break;
+          }
+          case "edit-day-row":
+            openEditDayEntry(el.getAttribute("data-date"));
+            break;
+          case "save-edited-day":
+            saveEditedDayEntry();
+            break;
+          case "delete-payment": {
+            const payId = el.getAttribute("data-payid");
+            askConfirm("Delete Payment?", "Remove this payment entry from ledger?", async () => {
+              state.payments = state.payments.filter((p) => p.id !== payId);
+              await savePersistentData();
+              renderLedgerDetail();
+              showToast("Payment removed");
+            });
+            break;
+          }
+          case "delete-current-customer": {
+            const cust = state.customers.find((c) => c.id === activeLedgerCustId);
+            if (!cust) break;
+            askConfirm(
+              "Delete Customer?",
+              `Remove "${cust.name}" and all their milk & payment records permanently?`,
+              async () => {
+                state.customers = state.customers.filter((c) => c.id !== cust.id);
+                state.payments = state.payments.filter((p) => p.custId !== cust.id);
+                for (const d in state.entries) delete state.entries[d][cust.id];
+                await savePersistentData();
+                closeLedgerDetail();
+                showToast("🗑️ Customer deleted");
+              }
+            );
+            break;
+          }
+
+          // Analytics actions
+          case "analytics-preset":
+            applyAnalyticsPreset(el.getAttribute("data-preset"));
+            break;
+          case "open-business-pdf":
+            openBusinessRangePDFReport();
+            break;
+
+          // PDF modal actions
+          case "trigger-print":
+            triggerBrowserPrint();
+            break;
+          case "download-report-html":
+            downloadStandaloneReportFile();
+            break;
+
+          // Settings & Backup actions
+          case "save-settings":
+            saveGlobalSettings();
+            break;
+          case "download-backup":
+            downloadBackupJSON();
+            break;
+          case "export-csv":
+            exportCustomRangeCSV();
+            break;
+          case "load-demo-data":
+            if (state.customers.length > 0) {
+              askConfirm(
+                "Load 14-Day Demo Data?",
+                "This will replace current customers with 4 sample dairy customers and 14 days of entries.",
+                () => seedRealistic14DayDemoData(true)
+              );
+            } else {
+              seedRealistic14DayDemoData(true);
+            }
+            break;
+          case "reset-all-data":
+            askConfirm(
+              "Clear All Data?",
+              "This will permanently delete all customers, milk entries, and payments.",
+              async () => {
+                state = {
+                  dairyName: "Fresh Cow Dairy",
+                  dairyPhone: "",
+                  dairyUpi: "",
+                  defaultRate: 60,
+                  darkMode: state.darkMode,
+                  updatedAt: Date.now(),
+                  customers: [],
+                  entries: {},
+                  payments: []
+                };
+                await savePersistentData();
+                renderDeliveryView();
+                renderCustomersListView();
+                renderAnalyticsView();
+                showToast("🗑️ All app data cleared");
+              }
+            );
+            break;
+
+          // Generic modal closer
+          case "close-modal":
+            closeModal(el.getAttribute("data-modal"));
+            break;
+        }
+      });
+
+      // Boot App safely when DOM is ready
+      window.addEventListener("DOMContentLoaded", async () => {
+        const today = getTodayISO();
+        document.getElementById("deliveryDateInput").value = today;
+        document.getElementById("payDateInput").value = today;
+
+        // Bind non-click input/form listeners
+        document.getElementById("deliveryDateInput").addEventListener("change", renderDeliveryView);
+        document.getElementById("deliverySearchInput").addEventListener("input", renderDeliveryView);
+        document.getElementById("ledgerSearchInput").addEventListener("input", renderCustomersListView);
+
+        document.getElementById("ledgerFromDate").addEventListener("change", onLedgerCustomDateChanged);
+        document.getElementById("ledgerToDate").addEventListener("change", onLedgerCustomDateChanged);
+
+        document.getElementById("analyticsFromDate").addEventListener("change", onAnalyticsCustomDateChanged);
+        document.getElementById("analyticsToDate").addEventListener("change", onAnalyticsCustomDateChanged);
+
+        document.getElementById("customerForm").addEventListener("submit", saveCustomerForm);
+        document.getElementById("paymentForm").addEventListener("submit", savePaymentForm);
+        document.getElementById("restoreJsonInput").addEventListener("change", restoreBackupJSON);
+
+        await loadPersistentData();
+
+        // Initialize default ranges (This Month) for Analytics & CSV Export
+        const defaultMonthRange = computePresetRange("this_month");
+        document.getElementById("analyticsFromDate").value = defaultMonthRange.from;
+        document.getElementById("analyticsToDate").value = defaultMonthRange.to;
+        document.getElementById("exportCsvFromDate").value = defaultMonthRange.from;
+        document.getElementById("exportCsvToDate").value = defaultMonthRange.to;
+
+        document.getElementById("settingDairyName").value = state.dairyName;
+        document.getElementById("settingDairyPhone").value = state.dairyPhone || "";
+        document.getElementById("settingDairyUpi").value = state.dairyUpi || "";
+        document.getElementById("settingDefaultRate").value = state.defaultRate;
+
+        renderDeliveryView();
+        renderCustomersListView();
+        renderAnalyticsView();
+      });
+    })();
+  </script>
+</body>
+</html>
